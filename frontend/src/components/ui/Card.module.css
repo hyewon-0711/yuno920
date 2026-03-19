@@ -1,0 +1,16 @@
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-normal);
+}
+
+.clickable { cursor: pointer; }
+.clickable:hover { box-shadow: var(--shadow-md); }
+.clickable:active { transform: scale(0.99); }
+
+.selected {
+  border: 2px solid var(--brand-primary);
+  background: var(--surface-primary);
+}

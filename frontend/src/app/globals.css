@@ -1,54 +1,208 @@
-@import "tailwindcss";
-
-@font-face {
-  font-family: "Pretendard";
-  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+/* ========== Reset ========== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+/* ========== Design Tokens ========== */
 :root {
-  --color-primary: #F97316;
-  --color-primary-light: #FFF7ED;
-  --color-primary-dark: #EA580C;
+  /* Brand */
+  --brand-primary: #F97316;
+  --brand-primary-light: #FFF7ED;
+  --brand-primary-dark: #EA580C;
+  --brand-primary-active: #C2410C;
 
-  --color-secondary: #3B82F6;
-  --color-success: #10B981;
-  --color-warning: #F59E0B;
-  --color-error: #EF4444;
-  --color-info: #6366F1;
+  /* Background */
+  --bg-default: #F9FAFB;
+  --bg-card: #FFFFFF;
+  --bg-muted: #F3F4F6;
+  --bg-elevated: #FFFFFF;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
 
-  --color-tab-home: #F97316;
-  --color-tab-growth: #10B981;
-  --color-tab-record: #3B82F6;
-  --color-tab-play: #8B5CF6;
-  --color-tab-insight: #6366F1;
+  /* Surface */
+  --surface-primary: #FFF7ED;
+  --surface-success: #ECFDF5;
+  --surface-warning: #FFFBEB;
+  --surface-error: #FEF2F2;
+  --surface-info: #EEF2FF;
 
-  --background: #F9FAFB;
-  --foreground: #111827;
+  /* Text */
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-tertiary: #6B7280;
+  --text-disabled: #9CA3AF;
+  --text-placeholder: #9CA3AF;
+  --text-inverse: #FFFFFF;
+
+  /* Border */
+  --border-default: #E5E7EB;
+  --border-light: #F3F4F6;
+  --border-focus: #F97316;
+  --border-error: #EF4444;
+
+  /* Action */
+  --action-primary: #F97316;
+  --action-primary-hover: #EA580C;
+  --action-primary-active: #C2410C;
+  --action-secondary: #3B82F6;
+  --action-destructive: #EF4444;
+  --action-destructive-hover: #DC2626;
+
+  /* Status */
+  --status-success: #10B981;
+  --status-warning: #F59E0B;
+  --status-error: #EF4444;
+  --status-info: #6366F1;
+
+  /* Tab Theme */
+  --tab-home: #F97316;
+  --tab-growth: #10B981;
+  --tab-record: #3B82F6;
+  --tab-play: #8B5CF6;
+  --tab-insight: #6366F1;
+
+  /* Emotion */
+  --emotion-happy-bg: #FEF3C7;
+  --emotion-happy: #F59E0B;
+  --emotion-neutral-bg: #F3F4F6;
+  --emotion-neutral: #6B7280;
+  --emotion-sad-bg: #DBEAFE;
+  --emotion-sad: #3B82F6;
+  --emotion-sick-bg: #FEE2E2;
+  --emotion-sick: #EF4444;
+  --emotion-tired-bg: #EDE9FE;
+  --emotion-tired: #8B5CF6;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-nav: 0 -4px 12px rgba(0, 0, 0, 0.05);
+
+  /* Transition */
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  /* Z-index */
+  --z-nav: 50;
+  --z-header: 40;
+  --z-modal: 100;
+  --z-toast: 200;
+
+  /* Layout */
+  --max-width: 480px;
+  --content-max-width: 960px;
+  --header-height: 56px;
+  --nav-height: 64px;
+  --sidebar-width: 240px;
+  --page-padding: 20px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--color-primary);
-  --color-primary-light: var(--color-primary-light);
-  --color-primary-dark: var(--color-primary-dark);
-  --color-secondary: var(--color-secondary);
-  --color-success: var(--color-success);
-  --color-warning: var(--color-warning);
-  --color-error: var(--color-error);
-  --color-info: var(--color-info);
-  --font-sans: "Pretendard", var(--font-geist-sans), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono);
+/* ========== Responsive: Desktop ========== */
+@media (min-width: 768px) {
+  :root {
+    --page-padding: 32px;
+  }
+}
+
+/* ========== Base ========== */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: "Pretendard Variable", "Pretendard", system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg-default);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  background: none;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* ========== Typography Utility ========== */
+.text-display { font-size: 32px; font-weight: 700; line-height: 40px; letter-spacing: -0.02em; }
+.text-h1 { font-size: 24px; font-weight: 700; line-height: 32px; }
+.text-h2 { font-size: 20px; font-weight: 600; line-height: 28px; }
+.text-h3 { font-size: 18px; font-weight: 500; line-height: 26px; }
+.text-body { font-size: 16px; font-weight: 400; line-height: 24px; }
+.text-body-sm { font-size: 14px; font-weight: 400; line-height: 20px; }
+.text-caption { font-size: 12px; font-weight: 500; line-height: 16px; }
+.text-metric-lg { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; }
+.text-metric-md { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+.text-metric-sm { font-size: 18px; font-weight: 600; letter-spacing: -0.02em; }
+
+/* ========== Scrollbar ========== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: var(--radius-full); }
+
+/* ========== Focus Visible ========== */
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* ========== Animations ========== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

@@ -1,43 +1,36 @@
 import { ButtonHTMLAttributes } from "react";
+import styles from "./Button.module.css";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "destructive";
   size?: "default" | "small";
   fullWidth?: boolean;
+  loading?: boolean;
 }
-
-const variantStyles = {
-  primary: "bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-dark)] active:scale-[0.98]",
-  secondary: "border border-[var(--color-primary)] text-[var(--color-primary)] bg-white hover:bg-[var(--color-primary-light)] active:scale-[0.98]",
-  ghost: "text-gray-700 bg-transparent hover:bg-gray-100 active:scale-[0.98]",
-};
-
-const sizeStyles = {
-  default: "h-12 px-6 text-base rounded-xl",
-  small: "h-9 px-4 text-sm rounded-lg",
-};
 
 export default function Button({
   variant = "primary",
   size = "default",
   fullWidth = false,
-  className = "",
+  loading = false,
+  disabled,
   children,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`
-        inline-flex items-center justify-center font-semibold transition-all duration-200
-        disabled:opacity-50 disabled:pointer-events-none
-        ${variantStyles[variant]}
-        ${sizeStyles[size]}
-        ${fullWidth ? "w-full" : ""}
-        ${className}
-      `}
+      className={[
+        styles.btn,
+        styles[variant],
+        styles[size],
+        fullWidth ? styles.fullWidth : "",
+        loading ? styles.loading : "",
+      ].join(" ")}
+      disabled={disabled || loading}
       {...props}
     >
       {children}
+      {loading && <span className={styles.spinner} />}
     </button>
   );
 }

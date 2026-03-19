@@ -1,0 +1,130 @@
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.addBtn {
+  font-size: 14px;
+  color: var(--brand-primary);
+  font-weight: 500;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.info { flex: 1; }
+
+.time {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timeCompleted {
+  color: var(--text-disabled);
+  text-decoration: line-through;
+}
+
+.title {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.titleCompleted {
+  color: var(--text-disabled);
+  text-decoration: line-through;
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: var(--surface-primary);
+  color: var(--brand-primary);
+  white-space: nowrap;
+}
+
+.badgeOngoing {
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+}
+
+.deleteBtn {
+  padding: 4px;
+  color: var(--text-disabled);
+  font-size: 16px;
+}
+
+.deleteBtn:hover { color: var(--status-error); }
+
+/* Add Form */
+.addForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.formInput {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.formInput:focus { border-color: var(--border-focus); }
+
+.formBtn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-sm);
+  background: var(--action-primary);
+  color: var(--text-inverse);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.formBtn:disabled { opacity: 0.5; }

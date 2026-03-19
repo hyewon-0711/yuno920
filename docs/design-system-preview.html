@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yuno920 Design System Preview</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  :root {
+    /* Brand */
+    --brand-primary: #F97316;
+    --brand-primary-light: #FFF7ED;
+    --brand-primary-dark: #EA580C;
+
+    /* Background */
+    --bg-default: #F9FAFB;
+    --bg-card: #FFFFFF;
+    --bg-muted: #F3F4F6;
+    --bg-elevated: #FFFFFF;
+    --bg-overlay: rgba(0,0,0,0.5);
+
+    /* Surface */
+    --surface-primary: #FFF7ED;
+    --surface-success: #ECFDF5;
+    --surface-warning: #FFFBEB;
+    --surface-error: #FEF2F2;
+    --surface-info: #EEF2FF;
+
+    /* Text */
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-tertiary: #6B7280;
+    --text-disabled: #9CA3AF;
+    --text-placeholder: #9CA3AF;
+    --text-inverse: #FFFFFF;
+
+    /* Border */
+    --border-default: #E5E7EB;
+    --border-light: #F3F4F6;
+    --border-focus: #F97316;
+    --border-error: #EF4444;
+
+    /* Action */
+    --action-primary: #F97316;
+    --action-primary-hover: #EA580C;
+    --action-primary-active: #C2410C;
+    --action-secondary: #3B82F6;
+    --action-destructive: #EF4444;
+
+    /* Status */
+    --status-success: #10B981;
+    --status-warning: #F59E0B;
+    --status-error: #EF4444;
+    --status-info: #6366F1;
+
+    /* Tab */
+    --tab-home: #F97316;
+    --tab-growth: #10B981;
+    --tab-record: #3B82F6;
+    --tab-play: #8B5CF6;
+    --tab-insight: #6366F1;
+
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+
+    /* Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-full: 9999px;
+
+    /* Shadow */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+    background: var(--bg-default);
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+  h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+  h1 span { color: var(--brand-primary); }
+  .subtitle { font-size: 16px; color: var(--text-tertiary); margin-bottom: 48px; }
+  h2 {
+    font-size: 20px; font-weight: 600; margin: 48px 0 20px;
+    padding-bottom: 12px; border-bottom: 2px solid var(--border-default);
+  }
+  h3 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; color: var(--text-secondary); }
+
+  /* Color Swatches */
+  .color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+  .color-swatch {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+  }
+  .color-swatch .preview { height: 64px; }
+  .color-swatch .info { padding: 10px 12px; }
+  .color-swatch .name { font-size: 13px; font-weight: 600; }
+  .color-swatch .code { font-size: 11px; color: var(--text-tertiary); font-family: monospace; }
+  .color-swatch .token { font-size: 10px; color: var(--text-disabled); font-family: monospace; margin-top: 2px; }
+
+  /* Typography */
+  .type-row {
+    display: flex; align-items: baseline; gap: 20px;
+    padding: 16px 0; border-bottom: 1px solid var(--border-light);
+  }
+  .type-label { width: 100px; flex-shrink: 0; font-size: 12px; color: var(--text-tertiary); font-family: monospace; }
+  .type-meta { width: 160px; flex-shrink: 0; font-size: 11px; color: var(--text-disabled); font-family: monospace; }
+
+  /* Spacing */
+  .spacing-row { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  .spacing-bar { height: 24px; background: var(--surface-primary); border: 1px solid var(--brand-primary); border-radius: 4px; }
+  .spacing-label { font-size: 12px; font-family: monospace; color: var(--text-tertiary); width: 80px; flex-shrink: 0; }
+  .spacing-val { font-size: 12px; font-family: monospace; color: var(--text-disabled); }
+
+  /* Radius */
+  .radius-grid { display: flex; gap: 20px; flex-wrap: wrap; }
+  .radius-item { text-align: center; }
+  .radius-box {
+    width: 80px; height: 80px; background: var(--surface-primary);
+    border: 2px solid var(--brand-primary); margin-bottom: 8px;
+  }
+  .radius-item span { font-size: 11px; font-family: monospace; color: var(--text-tertiary); }
+
+  /* Shadow */
+  .shadow-grid { display: flex; gap: 24px; flex-wrap: wrap; }
+  .shadow-item { text-align: center; }
+  .shadow-box {
+    width: 120px; height: 80px; background: var(--bg-card);
+    border-radius: var(--radius-md); margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--text-tertiary);
+  }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    font-family: inherit; font-size: 16px; font-weight: 600;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-default { height: 48px; padding: 0 24px; border-radius: var(--radius-md); }
+  .btn-small { height: 36px; padding: 0 16px; border-radius: var(--radius-sm); font-size: 14px; }
+  .btn-primary { background: var(--action-primary); color: var(--text-inverse); }
+  .btn-primary:hover { background: var(--action-primary-hover); transform: scale(1.02); }
+  .btn-primary:active { background: var(--action-primary-active); transform: scale(0.98); }
+  .btn-secondary { background: var(--bg-card); color: var(--action-primary); border: 1.5px solid var(--action-primary); }
+  .btn-secondary:hover { background: var(--surface-primary); transform: scale(1.02); }
+  .btn-ghost { background: transparent; color: var(--text-secondary); }
+  .btn-ghost:hover { background: var(--bg-muted); }
+  .btn-destructive { background: var(--action-destructive); color: var(--text-inverse); }
+  .btn-disabled { opacity: 0.5; pointer-events: none; }
+  .btn-loading { position: relative; color: transparent; }
+  .btn-loading::after {
+    content: ""; position: absolute; width: 20px; height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.3); border-top-color: white;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Input */
+  .input-group { margin-bottom: 20px; }
+  .input-label { font-size: 14px; font-weight: 500; color: var(--text-secondary); margin-bottom: 6px; }
+  .input {
+    width: 100%; height: 48px; padding: 0 16px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-default); background: var(--bg-card);
+    font-family: inherit; font-size: 16px; color: var(--text-primary);
+    outline: none; transition: all 0.2s;
+  }
+  .input::placeholder { color: var(--text-placeholder); }
+  .input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(249,115,22,0.1); }
+  .input-error { border-color: var(--border-error) !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.1) !important; }
+  .input-disabled { background: var(--bg-muted); opacity: 0.6; pointer-events: none; }
+  .error-msg { font-size: 12px; color: var(--status-error); margin-top: 6px; }
+
+  /* Card */
+  .card {
+    background: var(--bg-card); border-radius: var(--radius-lg);
+    padding: var(--space-4); box-shadow: var(--shadow-sm);
+    transition: all 0.2s;
+  }
+  .card-clickable:hover { box-shadow: var(--shadow-md); }
+  .card-clickable:active { transform: scale(0.99); }
+  .card-selected { border: 2px solid var(--brand-primary); background: var(--surface-primary); }
+  .card-title { font-size: 18px; font-weight: 500; margin-bottom: 8px; }
+  .card-body { font-size: 14px; color: var(--text-secondary); }
+
+  /* Tags */
+  .tag-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tag {
+    display: inline-flex; align-items: center; height: 28px; padding: 0 12px;
+    border-radius: var(--radius-full); font-size: 12px; font-weight: 500;
+  }
+
+  /* Emotion */
+  .emotion-row { display: flex; gap: 16px; }
+  .emotion-item {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    cursor: pointer; padding: 8px; border-radius: var(--radius-md); transition: all 0.2s;
+    min-width: 56px;
+  }
+  .emotion-item:hover { background: var(--bg-muted); }
+  .emotion-item.active { transform: scale(1.15); }
+  .emotion-item .emoji { font-size: 32px; }
+  .emotion-item .label { font-size: 11px; font-weight: 600; color: var(--text-tertiary); }
+  .emotion-item.active .label { color: var(--text-primary); }
+
+  /* Bottom Nav Preview */
+  .nav-preview {
+    background: var(--bg-card); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md); padding: 8px 0;
+    display: flex; justify-content: space-around; max-width: 400px;
+  }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 12px; }
+  .nav-icon { font-size: 22px; }
+  .nav-label { font-size: 10px; font-weight: 500; }
+  .nav-inactive { color: #9CA3AF; }
+
+  /* Domain Cards */
+  .domain-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px; }
+  .schedule-card {
+    display: flex; gap: 12px; align-items: center;
+    padding: 14px 16px; background: var(--bg-card); border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+  }
+  .schedule-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .schedule-time { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+  .schedule-title { font-size: 15px; color: var(--text-secondary); }
+  .schedule-meta { font-size: 12px; color: var(--text-tertiary); }
+
+  .metric-card {
+    background: var(--bg-card); border-radius: var(--radius-md);
+    padding: 16px; box-shadow: var(--shadow-sm);
+  }
+  .metric-label { font-size: 12px; font-weight: 500; color: var(--text-tertiary); }
+  .metric-value { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; color: var(--text-primary); }
+  .metric-unit { font-size: 14px; font-weight: 400; color: var(--text-tertiary); }
+  .metric-change { font-size: 13px; margin-top: 4px; }
+
+  .ai-card {
+    background: var(--surface-info); border: 1px solid rgba(99,102,241,0.2);
+    border-radius: var(--radius-lg); padding: 16px;
+  }
+  .ai-card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .ai-card-icon { font-size: 18px; }
+  .ai-card-title { font-size: 16px; font-weight: 600; color: var(--status-info); }
+  .ai-card-body { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
+
+  .game-card {
+    background: var(--bg-card); border-radius: var(--radius-lg);
+    padding: 24px 16px; box-shadow: var(--shadow-sm); text-align: center;
+  }
+  .game-icon { font-size: 48px; margin-bottom: 8px; }
+  .game-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+  .game-level { font-size: 13px; font-weight: 600; color: var(--tab-play); }
+
+  /* Toast */
+  .toast {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 20px; background: var(--bg-card);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-lg);
+    font-size: 14px; font-weight: 500;
+  }
+  .toast-icon { font-size: 18px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .two-col { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1><span>Yuno920</span> Design System</h1>
+<p class="subtitle">AI 기반 아이 성장·육아 통합 플랫폼 — 디자인 토큰 & 컴포넌트 프리뷰</p>
+
+<!-- ==================== COLORS ==================== -->
+<h2>A-1. Colors — Brand</h2>
+<div class="color-grid">
+  <div class="color-swatch"><div class="preview" style="background:#F97316"></div><div class="info"><div class="name">Primary</div><div class="code">#F97316</div><div class="token">--brand-primary</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#FFF7ED"></div><div class="info"><div class="name">Primary Light</div><div class="code">#FFF7ED</div><div class="token">--brand-primary-light</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#EA580C"></div><div class="info"><div class="name">Primary Dark</div><div class="code">#EA580C</div><div class="token">--brand-primary-dark</div></div></div>
+</div>
+
+<h3>Background</h3>
+<div class="color-grid">
+  <div class="color-swatch"><div class="preview" style="background:#F9FAFB; border:1px solid #E5E7EB"></div><div class="info"><div class="name">Default</div><div class="code">#F9FAFB</div><div class="token">--bg-default</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#FFFFFF; border:1px solid #E5E7EB"></div><div class="info"><div class="name">Card</div><div class="code">#FFFFFF</div><div class="token">--bg-card</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#F3F4F6"></div><div class="info"><div class="name">Muted</div><div class="code">#F3F4F6</div><div class="token">--bg-muted</div></div></div>
+</div>
+
+<h3>Text</h3>
+<div class="color-grid">
+  <div class="color-swatch"><div class="preview" style="background:#111827"></div><div class="info"><div class="name">Primary</div><div class="code">#111827</div><div class="token">--text-primary</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#374151"></div><div class="info"><div class="name">Secondary</div><div class="code">#374151</div><div class="token">--text-secondary</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#6B7280"></div><div class="info"><div class="name">Tertiary</div><div class="code">#6B7280</div><div class="token">--text-tertiary</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#9CA3AF"></div><div class="info"><div class="name">Disabled</div><div class="code">#9CA3AF</div><div class="token">--text-disabled</div></div></div>
+</div>
+
+<h3>Status</h3>
+<div class="color-grid">
+  <div class="color-swatch"><div class="preview" style="background:#10B981"></div><div class="info"><div class="name">Success</div><div class="code">#10B981</div><div class="token">--status-success</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#F59E0B"></div><div class="info"><div class="name">Warning</div><div class="code">#F59E0B</div><div class="token">--status-warning</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#EF4444"></div><div class="info"><div class="name">Error</div><div class="code">#EF4444</div><div class="token">--status-error</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#6366F1"></div><div class="info"><div class="name">Info / AI</div><div class="code">#6366F1</div><div class="token">--status-info</div></div></div>
+</div>
+
+<h3>Tab Theme</h3>
+<div class="color-grid">
+  <div class="color-swatch"><div class="preview" style="background:#F97316"></div><div class="info"><div class="name">Home</div><div class="code">#F97316</div><div class="token">--tab-home</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#10B981"></div><div class="info"><div class="name">Growth</div><div class="code">#10B981</div><div class="token">--tab-growth</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#3B82F6"></div><div class="info"><div class="name">Record</div><div class="code">#3B82F6</div><div class="token">--tab-record</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#8B5CF6"></div><div class="info"><div class="name">Play</div><div class="code">#8B5CF6</div><div class="token">--tab-play</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#6366F1"></div><div class="info"><div class="name">Insight</div><div class="code">#6366F1</div><div class="token">--tab-insight</div></div></div>
+</div>
+
+<h3>Emotion</h3>
+<div class="color-grid">
+  <div class="color-swatch"><div class="preview" style="background:#FEF3C7"></div><div class="info"><div class="name">😊 좋음</div><div class="code">#FEF3C7 / #F59E0B</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#F3F4F6"></div><div class="info"><div class="name">😐 보통</div><div class="code">#F3F4F6 / #6B7280</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#DBEAFE"></div><div class="info"><div class="name">😢 안좋음</div><div class="code">#DBEAFE / #3B82F6</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#FEE2E2"></div><div class="info"><div class="name">🤒 아픔</div><div class="code">#FEE2E2 / #EF4444</div></div></div>
+  <div class="color-swatch"><div class="preview" style="background:#EDE9FE"></div><div class="info"><div class="name">😴 피곤</div><div class="code">#EDE9FE / #8B5CF6</div></div></div>
+</div>
+
+<!-- ==================== TYPOGRAPHY ==================== -->
+<h2>A-2. Typography</h2>
+<div class="type-row"><span class="type-label">Display</span><span class="type-meta">32px / Bold / 40px</span><span style="font-size:32px;font-weight:700;line-height:40px">윤호의 하루를 기록하세요</span></div>
+<div class="type-row"><span class="type-label">H1</span><span class="type-meta">24px / Bold / 32px</span><span style="font-size:24px;font-weight:700;line-height:32px">오늘의 기록</span></div>
+<div class="type-row"><span class="type-label">H2</span><span class="type-meta">20px / SemiBold / 28px</span><span style="font-size:20px;font-weight:600;line-height:28px">최근 기록</span></div>
+<div class="type-row"><span class="type-label">H3</span><span class="type-meta">18px / Medium / 26px</span><span style="font-size:18px;font-weight:500;line-height:26px">2026년 3월 18일</span></div>
+<div class="type-row"><span class="type-label">Body</span><span class="type-meta">16px / Regular / 24px</span><span style="font-size:16px;font-weight:400;line-height:24px">오늘 학교에서 수학 시험을 잘 봤대요!</span></div>
+<div class="type-row"><span class="type-label">Body SM</span><span class="type-meta">14px / Regular / 20px</span><span style="font-size:14px;font-weight:400;line-height:20px;color:var(--text-secondary)">보조 텍스트 및 설명</span></div>
+<div class="type-row"><span class="type-label">Caption</span><span class="type-meta">12px / Medium / 16px</span><span style="font-size:12px;font-weight:500;line-height:16px;color:var(--text-tertiary)">15:30 · 건강 · 학습</span></div>
+
+<h3>Data / Metric Typography</h3>
+<div class="type-row"><span class="type-label">Metric LG</span><span class="type-meta">36px / Bold / tight</span><span style="font-size:36px;font-weight:700;letter-spacing:-0.02em">128.5<span style="font-size:14px;font-weight:400;color:var(--text-tertiary)">cm</span></span></div>
+<div class="type-row"><span class="type-label">Metric MD</span><span class="type-meta">24px / Bold / tight</span><span style="font-size:24px;font-weight:700;letter-spacing:-0.02em">98<span style="font-size:14px;font-weight:400;color:var(--text-tertiary)">점</span></span></div>
+<div class="type-row"><span class="type-label">Metric SM</span><span class="type-meta">18px / SemiBold / tight</span><span style="font-size:18px;font-weight:600;letter-spacing:-0.02em">30<span style="font-size:14px;font-weight:400;color:var(--text-tertiary)">분</span></span></div>
+
+<!-- ==================== SPACING ==================== -->
+<h2>A-3. Spacing</h2>
+<div class="spacing-row"><span class="spacing-label">space-1</span><div class="spacing-bar" style="width:4px"></div><span class="spacing-val">4px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-2</span><div class="spacing-bar" style="width:8px"></div><span class="spacing-val">8px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-3</span><div class="spacing-bar" style="width:12px"></div><span class="spacing-val">12px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-4</span><div class="spacing-bar" style="width:16px"></div><span class="spacing-val">16px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-5</span><div class="spacing-bar" style="width:20px"></div><span class="spacing-val">20px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-6</span><div class="spacing-bar" style="width:24px"></div><span class="spacing-val">24px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-8</span><div class="spacing-bar" style="width:32px"></div><span class="spacing-val">32px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-10</span><div class="spacing-bar" style="width:40px"></div><span class="spacing-val">40px</span></div>
+<div class="spacing-row"><span class="spacing-label">space-12</span><div class="spacing-bar" style="width:48px"></div><span class="spacing-val">48px</span></div>
+
+<!-- ==================== RADIUS ==================== -->
+<h2>A-4. Radius</h2>
+<div class="radius-grid">
+  <div class="radius-item"><div class="radius-box" style="border-radius:8px"></div><span>sm · 8px</span></div>
+  <div class="radius-item"><div class="radius-box" style="border-radius:12px"></div><span>md · 12px</span></div>
+  <div class="radius-item"><div class="radius-box" style="border-radius:16px"></div><span>lg · 16px</span></div>
+  <div class="radius-item"><div class="radius-box" style="border-radius:24px"></div><span>xl · 24px</span></div>
+  <div class="radius-item"><div class="radius-box" style="border-radius:9999px"></div><span>full</span></div>
+</div>
+
+<!-- ==================== SHADOW ==================== -->
+<h2>A-5. Shadow</h2>
+<div class="shadow-grid">
+  <div class="shadow-item"><div class="shadow-box" style="box-shadow:var(--shadow-sm)">shadow-sm</div></div>
+  <div class="shadow-item"><div class="shadow-box" style="box-shadow:var(--shadow-md)">shadow-md</div></div>
+  <div class="shadow-item"><div class="shadow-box" style="box-shadow:var(--shadow-lg)">shadow-lg</div></div>
+</div>
+
+<!-- ==================== BUTTONS ==================== -->
+<h2>B-1. Buttons</h2>
+<h3>Default (48px)</h3>
+<div class="btn-row">
+  <button class="btn btn-default btn-primary">Primary</button>
+  <button class="btn btn-default btn-secondary">Secondary</button>
+  <button class="btn btn-default btn-ghost">Ghost</button>
+  <button class="btn btn-default btn-destructive">Destructive</button>
+</div>
+<h3>Small (36px)</h3>
+<div class="btn-row">
+  <button class="btn btn-small btn-primary">Small Primary</button>
+  <button class="btn btn-small btn-secondary">Small Secondary</button>
+  <button class="btn btn-small btn-ghost">Small Ghost</button>
+</div>
+<h3>States</h3>
+<div class="btn-row">
+  <button class="btn btn-default btn-primary">Normal</button>
+  <button class="btn btn-default btn-primary btn-disabled">Disabled</button>
+  <button class="btn btn-default btn-primary btn-loading">Loading</button>
+</div>
+
+<!-- ==================== INPUTS ==================== -->
+<h2>B-2. Input</h2>
+<div style="max-width:400px">
+  <div class="input-group"><div class="input-label">이름</div><input class="input" placeholder="아이 이름을 입력하세요"></div>
+  <div class="input-group"><div class="input-label">생년월일</div><input class="input" type="date" value="2018-09-20"></div>
+  <div class="input-group"><div class="input-label">이메일 (에러 상태)</div><input class="input input-error" value="invalid-email"><div class="error-msg">올바른 이메일 형식이 아닙니다</div></div>
+  <div class="input-group"><div class="input-label">비활성 상태</div><input class="input input-disabled" value="비활성 입력" disabled></div>
+</div>
+
+<!-- ==================== CARDS ==================== -->
+<h2>B-3. Card</h2>
+<div style="max-width:400px; display:flex; flex-direction:column; gap:12px">
+  <div class="card"><div class="card-title">기본 카드</div><div class="card-body">이것은 기본 카드 스타일입니다.</div></div>
+  <div class="card card-clickable" style="cursor:pointer"><div class="card-title">클릭 가능 카드</div><div class="card-body">hover 시 그림자가 깊어집니다.</div></div>
+  <div class="card card-selected"><div class="card-title">선택된 카드</div><div class="card-body">Primary 테두리 + 배경 강조</div></div>
+</div>
+
+<!-- ==================== TAGS ==================== -->
+<h2>B-7. Tags / Chips</h2>
+<div class="tag-row">
+  <span class="tag" style="background:#ECFDF5;color:#059669">건강</span>
+  <span class="tag" style="background:#FEF3C7;color:#B45309">식사</span>
+  <span class="tag" style="background:#DBEAFE;color:#2563EB">학습</span>
+  <span class="tag" style="background:#EDE9FE;color:#7C3AED">놀이</span>
+  <span class="tag" style="background:#FCE7F3;color:#DB2777">감정</span>
+  <span class="tag" style="background:#FFF7ED;color:#EA580C">독서</span>
+  <span class="tag" style="background:#FEF2F2;color:#DC2626">마일스톤</span>
+</div>
+
+<!-- ==================== EMOTION ==================== -->
+<h2>B-10 (C). Emotion Selector</h2>
+<div class="emotion-row">
+  <div class="emotion-item active" style="background:#FEF3C7"><span class="emoji">😊</span><span class="label">좋음</span></div>
+  <div class="emotion-item"><span class="emoji">😐</span><span class="label">보통</span></div>
+  <div class="emotion-item"><span class="emoji">😢</span><span class="label">안좋음</span></div>
+  <div class="emotion-item"><span class="emoji">🤒</span><span class="label">아픔</span></div>
+  <div class="emotion-item"><span class="emoji">😴</span><span class="label">피곤</span></div>
+</div>
+
+<!-- ==================== TOAST ==================== -->
+<h2>B-8. Toast</h2>
+<div style="display:flex; flex-direction:column; gap:12px; max-width:360px">
+  <div class="toast"><span class="toast-icon" style="color:var(--status-success)">✓</span> 기록이 저장되었습니다</div>
+  <div class="toast"><span class="toast-icon" style="color:var(--status-error)">✕</span> 저장에 실패했습니다</div>
+  <div class="toast"><span class="toast-icon" style="color:var(--status-info)">ℹ</span> AI가 분석 중이에요</div>
+</div>
+
+<!-- ==================== BOTTOM NAV ==================== -->
+<h2>B-5. Bottom Navigation</h2>
+<div class="nav-preview">
+  <div class="nav-item" style="color:var(--tab-home)"><span class="nav-icon">🏠</span><span class="nav-label" style="font-weight:700">Home</span></div>
+  <div class="nav-item nav-inactive"><span class="nav-icon">📈</span><span class="nav-label">Growth</span></div>
+  <div class="nav-item nav-inactive"><span class="nav-icon">📝</span><span class="nav-label">Record</span></div>
+  <div class="nav-item nav-inactive"><span class="nav-icon">🎮</span><span class="nav-label">Play</span></div>
+  <div class="nav-item nav-inactive"><span class="nav-icon">✨</span><span class="nav-label">Insight</span></div>
+</div>
+
+<!-- ==================== DOMAIN COMPONENTS ==================== -->
+<h2>C. Domain Components</h2>
+
+<h3>C-1. Schedule Card (일정 카드)</h3>
+<div style="max-width:400px; display:flex; flex-direction:column; gap:8px">
+  <div class="schedule-card"><div class="schedule-dot" style="background:var(--tab-home)"></div><div><div class="schedule-time">09:00 <span class="schedule-meta">학교</span></div></div></div>
+  <div class="schedule-card"><div class="schedule-dot" style="background:#10B981"></div><div><div class="schedule-time">15:00 <span class="schedule-meta">태권도</span></div><div class="schedule-meta" style="color:var(--brand-primary);font-weight:600">1시간 후</div></div></div>
+  <div class="schedule-card"><div class="schedule-dot" style="background:#3B82F6"></div><div><div class="schedule-time">17:00 <span class="schedule-meta">영어학원</span></div></div></div>
+</div>
+
+<h3>C-3. Growth Metric Card (성장 지표)</h3>
+<div class="domain-grid">
+  <div class="metric-card"><div class="metric-label">키</div><div class="metric-value">128.5<span class="metric-unit">cm</span></div><div class="metric-change" style="color:var(--status-success)">▲ 3개월간 +2.3cm</div></div>
+  <div class="metric-card"><div class="metric-label">몸무게</div><div class="metric-value">27.2<span class="metric-unit">kg</span></div><div class="metric-change" style="color:var(--status-success)">▲ 3개월간 +0.8kg</div></div>
+  <div class="metric-card"><div class="metric-label">SR 점수</div><div class="metric-value">87<span class="metric-unit">점</span></div><div class="metric-change" style="color:var(--status-success)">▲ 지난달 대비 +5</div></div>
+  <div class="metric-card"><div class="metric-label">이번달 독서</div><div class="metric-value">8<span class="metric-unit">권</span></div><div class="metric-change" style="color:var(--text-tertiary)">목표 10권</div></div>
+</div>
+
+<h3>C-6. AI Insight Card</h3>
+<div style="max-width:400px">
+  <div class="ai-card">
+    <div class="ai-card-header"><span class="ai-card-icon">✨</span><span class="ai-card-title">하루 요약</span></div>
+    <div class="ai-card-body">"오늘 윤호는 학교에서 수학 시험을 잘 봤고, 태권도에서 품새를 연습했어요. 저녁에는 어린왕자를 20분 읽었습니다."</div>
+    <div style="margin-top:12px; font-size:14px; color:var(--text-tertiary)">감정 상태: <span style="font-size:18px">😊</span> 좋음</div>
+  </div>
+</div>
+
+<h3>C-7. Game Card</h3>
+<div class="domain-grid">
+  <div class="game-card"><div class="game-icon">🔢</div><div class="game-name">계산 게임</div><div class="game-level">Lv.12</div></div>
+  <div class="game-card"><div class="game-icon">🧠</div><div class="game-name">기억력 게임</div><div class="game-level">Lv.8</div></div>
+  <div class="game-card"><div class="game-icon">📖</div><div class="game-name">독서 퀴즈</div><div class="game-level">3문제</div></div>
+  <div class="game-card"><div class="game-icon">🎯</div><div class="game-name">오늘의 미션</div><div class="game-level">2/5 완료</div></div>
+</div>
+
+</div>
+</body>
+</html>

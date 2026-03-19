@@ -1,0 +1,61 @@
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: var(--space-3);
+}
+
+.goal {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.progressBar {
+  height: 8px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--brand-primary);
+  transition: width 0.5s ease;
+}
+
+.progressComplete {
+  background: var(--status-success);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.achieved {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.recentBook {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.empty {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-3) 0;
+}

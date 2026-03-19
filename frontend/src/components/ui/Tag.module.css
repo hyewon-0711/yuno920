@@ -1,0 +1,18 @@
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.health { background: #ECFDF5; color: #059669; }
+.meal { background: #FEF3C7; color: #B45309; }
+.learning { background: #DBEAFE; color: #2563EB; }
+.play { background: #EDE9FE; color: #7C3AED; }
+.emotion { background: #FCE7F3; color: #DB2777; }
+.reading { background: #FFF7ED; color: #EA580C; }
+.milestone { background: #FEF2F2; color: #DC2626; }
+.default { background: #F3F4F6; color: #4B5563; }

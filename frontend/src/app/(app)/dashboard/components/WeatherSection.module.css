@@ -1,0 +1,48 @@
+.card {
+  background: var(--surface-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.icon { font-size: 28px; }
+
+.temp {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.condition {
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.right { text-align: right; }
+
+.date {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.dustBadge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.good { background: var(--surface-success); color: var(--status-success); }
+.moderate { background: var(--surface-warning); color: var(--status-warning); }
+.bad { background: var(--surface-error); color: var(--status-error); }

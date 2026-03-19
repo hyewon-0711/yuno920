@@ -1,0 +1,29 @@
+.page {
+  padding: var(--space-5);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.gameCard {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-4);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.gameCard:hover { box-shadow: var(--shadow-md); }
+.gameCard:active { transform: scale(0.97); }
+
+.gameIcon { font-size: 40px; }
+.gameName { font-size: 16px; font-weight: 500; }
+.gameDesc { font-size: 12px; color: var(--text-tertiary); }

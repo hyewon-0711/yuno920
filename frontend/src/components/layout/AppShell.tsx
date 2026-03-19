@@ -1,4 +1,6 @@
 import BottomNav from "./BottomNav";
+import Sidebar from "./Sidebar";
+import styles from "./AppShell.module.css";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -6,10 +8,9 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   return (
-    <div className="mx-auto min-h-screen max-w-[480px] bg-background">
-      <main className="pb-20">
-        {children}
-      </main>
+    <div className={styles.shell}>
+      <Sidebar />
+      <main className={styles.main}>{children}</main>
       <BottomNav />
     </div>
   );

@@ -1,9 +1,25 @@
-from fastapi import APIRouter, Depends
-from app.models.schemas import ChatRequest, ChatResponse
-from app.services.openai_service import OpenAIService
+from datetime import date
+from fastapi import APIRouter, Depends, HTTPException
 from app.config import Settings, get_settings
+from app.services.openai_service import OpenAIService
+from app.services.supabase_service import SupabaseService
+from app.models.schemas import (
+    ChatRequest, ChatResponse,
+    DailySummaryRequest, DailySummaryResponse,
+    ReportRequest, ReportResponse,
+    CoachingRequest, CoachingResponse,
+    PersonalityRequest, PersonalityResponse,
+    HexagonRequest, HexagonResponse,
+    GrowthAdviceRequest, GrowthAdviceResponse,
+)
 
 router = APIRouter()
+
+
+def _get_child_age(birth_date_str: str) -> int:
+    birth = date.fromisoformat(birth_date_str)
+    today = date.today()
+    return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -11,3 +27,186 @@ async def chat(request: ChatRequest, settings: Settings = Depends(get_settings))
     service = OpenAIService(settings.openai_api_key)
     result = await service.chat(request.message)
     return ChatResponse(reply=result)
+
+
+@router.post("/daily-summary", response_model=DailySummaryResponse)
+async def daily_summary(request: DailySummaryRequest, settings: Settings = Depends(get_settings)):
+    db = SupabaseService()
+    child = db.get_child(request.child_id)
+    if not child:
+        raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
+
+    records = db.get_records_by_date(request.child_id, request.target_date)
+    reading_logs = db.get_reading_logs_by_date(request.child_id, request.target_date)
+
+    if not records and not reading_logs:
+        return DailySummaryResponse(
+            summary=f"{child['name']}의 오늘 기록이 아직 없어요. 기록을 남겨주세요!",
+            keywords=[],
+        )
+
+    ai = OpenAIService(settings.openai_api_key)
+    result = await ai.generate_daily_summary(child["name"], records, reading_logs)
+
+    db.save_ai_report(
+        child_id=request.child_id,
+        report_type="daily",
+        content=result.get("summary", ""),
+        metadata={"keywords": result.get("keywords", []), "mood": result.get("mood")},
+        period_start=request.target_date,
+        period_end=request.target_date,
+    )
+
+    return DailySummaryResponse(
+        summary=result.get("summary", ""),
+        mood=result.get("mood"),
+        keywords=result.get("keywords", []),
+    )
+
+
+@router.post("/weekly-report", response_model=ReportResponse)
+async def weekly_report(request: ReportRequest, settings: Settings = Depends(get_settings)):
+    db = SupabaseService()
+    child = db.get_child(request.child_id)
+    if not child:
+        raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
+
+    ai = OpenAIService(settings.openai_api_key)
+    records = db.get_recent_records(request.child_id, days=7)
+    reading = db.get_recent_reading_logs(request.child_id, days=7)
+
+    prompt = f"""{child['name']}의 주간 리포트를 작성해주세요.
+기록 {len(records)}건, 독서 {len(reading)}건의 데이터가 있습니다.
+300자 이내로 종합 분석과 격려를 포함해주세요."""
+
+    content = await ai.chat(prompt)
+    db.save_ai_report(
+        child_id=request.child_id,
+        report_type="weekly",
+        content=content,
+        metadata={"record_count": len(records), "reading_count": len(reading)},
+        period_start=request.start_date,
+        period_end=request.end_date,
+    )
+
+    return ReportResponse(content=content, metadata={"record_count": len(records), "reading_count": len(reading)})
+
+
+@router.post("/monthly-report", response_model=ReportResponse)
+async def monthly_report(request: ReportRequest, settings: Settings = Depends(get_settings)):
+    db = SupabaseService()
+    child = db.get_child(request.child_id)
+    if not child:
+        raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
+
+    ai = OpenAIService(settings.openai_api_key)
+    records = db.get_recent_records(request.child_id, days=30)
+    reading = db.get_recent_reading_logs(request.child_id, days=30)
+
+    prompt = f"""{child['name']}의 월간 리포트를 작성해주세요.
+기록 {len(records)}건, 독서 {len(reading)}건의 데이터가 있습니다.
+500자 이내로 성장 트렌드, 강점, 개선점을 분석해주세요."""
+
+    content = await ai.chat(prompt)
+    db.save_ai_report(
+        child_id=request.child_id,
+        report_type="monthly",
+        content=content,
+        metadata={"record_count": len(records), "reading_count": len(reading)},
+        period_start=request.start_date,
+        period_end=request.end_date,
+    )
+
+    return ReportResponse(content=content, metadata={"record_count": len(records), "reading_count": len(reading)})
+
+
+@router.post("/coaching", response_model=CoachingResponse)
+async def coaching(request: CoachingRequest, settings: Settings = Depends(get_settings)):
+    db = SupabaseService()
+    child = db.get_child(request.child_id)
+    if not child:
+        raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
+
+    child_age = _get_child_age(child["birth_date"])
+    schedules = db.get_today_schedules(request.child_id)
+    recent_records = db.get_recent_records(request.child_id, days=3)
+    recent_reading = db.get_recent_reading_logs(request.child_id, days=3)
+
+    ai = OpenAIService(settings.openai_api_key)
+    result = await ai.generate_coaching(
+        child_name=child["name"],
+        child_age=child_age,
+        schedules=schedules,
+        recent_records=recent_records,
+        recent_reading=recent_reading,
+    )
+
+    return CoachingResponse(
+        coaching=result["coaching"],
+        tips=result.get("tips", []),
+    )
+
+
+@router.post("/personality", response_model=PersonalityResponse)
+async def personality(request: PersonalityRequest, settings: Settings = Depends(get_settings)):
+    ai = OpenAIService(settings.openai_api_key)
+
+    birth_time_text = request.birth_time or "미입력"
+    prompt = f"""아이의 생년월일({request.birth_date}), 출생시간({birth_time_text})을 기반으로
+기질 및 성향 분석을 해주세요. 200자 이내, 긍정적인 톤으로 작성.
+JSON: {{"analysis": "...", "traits": {{"외향성": 7, "감성": 8, "호기심": 9}}}}"""
+
+    response = await ai.chat(prompt)
+
+    import json
+    try:
+        result = json.loads(response)
+    except (json.JSONDecodeError, ValueError):
+        result = {"analysis": response, "traits": {}}
+
+    return PersonalityResponse(analysis=result.get("analysis", response), traits=result.get("traits", {}))
+
+
+@router.post("/hexagon", response_model=HexagonResponse)
+async def hexagon(request: HexagonRequest, settings: Settings = Depends(get_settings)):
+    db = SupabaseService()
+    existing = db.get_hexagon_latest(request.child_id)
+    if existing:
+        return HexagonResponse(
+            learning=existing["learning"],
+            physical=existing["physical"],
+            social=existing["social"],
+            emotion=existing["emotion"],
+            creativity=existing["creativity"],
+            habit=existing["habit"],
+        )
+    return HexagonResponse(learning=50, physical=50, social=50, emotion=50, creativity=50, habit=50)
+
+
+@router.post("/growth-advice", response_model=GrowthAdviceResponse)
+async def growth_advice(request: GrowthAdviceRequest, settings: Settings = Depends(get_settings)):
+    ai = OpenAIService(settings.openai_api_key)
+    areas_text = ", ".join(request.weak_areas) if request.weak_areas else "전반적 개선"
+
+    prompt = f"""아이의 부족한 영역({areas_text})에 대한 개선 조언을 작성해주세요.
+200자 이내, 구체적인 활동 3가지를 추천해주세요."""
+
+    response = await ai.chat(prompt)
+    return GrowthAdviceResponse(advice=response, recommendations=[])
+
+
+@router.post("/auto-tag")
+async def auto_tag(
+    record_id: str,
+    content: str,
+    settings: Settings = Depends(get_settings),
+):
+    """기록 작성 후 자동 태깅 (프론트에서 비동기 호출)"""
+    ai = OpenAIService(settings.openai_api_key)
+    tags = await ai.auto_tag_record(content)
+
+    if tags:
+        db = SupabaseService()
+        db.update_record_categories(record_id, tags)
+
+    return {"record_id": record_id, "categories": tags}

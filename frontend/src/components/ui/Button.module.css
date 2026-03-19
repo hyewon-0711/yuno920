@@ -1,0 +1,50 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  white-space: nowrap;
+  position: relative;
+}
+
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* Sizes */
+.default { height: 48px; padding: 0 24px; font-size: 16px; border-radius: var(--radius-md); }
+.small { height: 36px; padding: 0 16px; font-size: 14px; border-radius: var(--radius-sm); }
+
+/* Variants */
+.primary { background: var(--action-primary); color: var(--text-inverse); }
+.primary:hover { background: var(--action-primary-hover); }
+
+.secondary {
+  background: var(--bg-card);
+  color: var(--action-primary);
+  border: 1.5px solid var(--action-primary);
+}
+.secondary:hover { background: var(--surface-primary); }
+
+.ghost { background: transparent; color: var(--text-secondary); }
+.ghost:hover { background: var(--bg-muted); }
+
+.destructive { background: var(--action-destructive); color: var(--text-inverse); }
+.destructive:hover { background: var(--action-destructive-hover); }
+
+/* Full width */
+.fullWidth { width: 100%; }
+
+/* Loading */
+.loading { color: transparent; }
+.spinner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2.5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}

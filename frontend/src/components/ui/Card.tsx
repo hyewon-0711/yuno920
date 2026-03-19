@@ -1,13 +1,26 @@
+import styles from "./Card.module.css";
+
 interface CardProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  selected?: boolean;
 }
 
-export default function Card({ children, className = "", onClick }: CardProps) {
+export default function Card({
+  children,
+  className = "",
+  onClick,
+  selected = false,
+}: CardProps) {
   return (
     <div
-      className={`rounded-2xl bg-white p-4 shadow-sm ${onClick ? "cursor-pointer active:scale-[0.99] transition-transform" : ""} ${className}`}
+      className={[
+        styles.card,
+        onClick ? styles.clickable : "",
+        selected ? styles.selected : "",
+        className,
+      ].join(" ")}
       onClick={onClick}
     >
       {children}
