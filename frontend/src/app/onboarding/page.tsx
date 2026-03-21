@@ -23,24 +23,38 @@ export default function OnboardingPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function checkChild() {
       const { data: { user } } = await supabase.auth.getUser();
+      if (cancelled) return;
       if (!user) {
         router.replace("/auth/login");
         return;
       }
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("children")
         .select("id")
         .eq("user_id", user.id)
         .limit(1);
+      if (cancelled) return;
+      if (error) {
+        console.error("onboarding children check:", error);
+        setChecking(false);
+        return;
+      }
       if (data && data.length > 0) {
         router.replace("/dashboard");
         return;
       }
       setChecking(false);
     }
+
     checkChild();
+    return () => {
+      cancelled = true;
+    };
+    // router는 Next에서 안정적이나, 의존성 변경 시 중복 요청으로 깜빡임 방지용 cleanup
   }, [router]);
 
   if (checking) {
