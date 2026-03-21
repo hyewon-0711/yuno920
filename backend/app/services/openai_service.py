@@ -184,3 +184,47 @@ class OpenAIService:
             }
         except (json.JSONDecodeError, ValueError, TypeError):
             return {"learning": 50, "physical": 50, "social": 50, "emotion": 50, "creativity": 50, "habit": 50}
+
+    async def generate_quiz(self, category: str, child_age: int = 8, count: int = 5) -> list[dict]:
+        """상식 퀴즈 생성 (선택한 영역에 대해)"""
+        import json
+        prompt = f"""당신은 초등학생(만 {child_age}세) 아이를 위한 상식 퀴즈 출제자입니다.
+"{category}" 영역에 대한 객관식 퀴즈를 {count}개 만들어주세요.
+
+규칙:
+- 아이가 이해할 수 있는 쉬운 말 사용
+- 4지선다
+- answer는 0~3 중 정답 인덱스
+- 각 문제에 짧은 설명(explanation) 추가
+
+다음 JSON 배열 형태로만 출력하세요 (다른 텍스트 없이):
+[
+  {{"question": "문제1", "options": ["보기1","보기2","보기3","보기4"], "answer": 0, "explanation": "설명"}},
+  {{"question": "문제2", "options": ["보기1","보기2","보기3","보기4"], "answer": 2, "explanation": "설명"}}
+]
+"""
+        response = await self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "상식 퀴즈 출제 AI입니다. JSON 배열만 출력하세요."},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        text = response.choices[0].message.content or "[]"
+        try:
+            start = text.index("[")
+            end = text.rindex("]") + 1
+            questions = json.loads(text[start:end])
+            result = []
+            for q in questions[:count]:
+                opt = q.get("options", [])
+                ans = int(q.get("answer", 0)) % max(1, len(opt))
+                result.append({
+                    "question": str(q.get("question", "")),
+                    "options": [str(o) for o in opt][:4],
+                    "answer": ans,
+                    "explanation": str(q.get("explanation", "")) if q.get("explanation") else None,
+                })
+            return result
+        except (json.JSONDecodeError, ValueError, IndexError):
+            return []

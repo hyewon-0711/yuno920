@@ -108,16 +108,17 @@ class MealResponse(BaseModel):
     menu: list[str] = []
 
 
-# ========== Play Quiz ==========
+# ========== Play Quiz (상식 퀴즈) ==========
 class QuizGenerateRequest(BaseModel):
     child_id: str
-    book_title: str
+    category: str  # 과학, 역사, 자연, 동물, 스포츠, 음식, 한국상식, 세계상식, 인물, 문화예술
 
 
 class QuizQuestion(BaseModel):
     question: str
     options: list[str]
     answer: int
+    explanation: str | None = None
 
 
 class QuizGenerateResponse(BaseModel):
