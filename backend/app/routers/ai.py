@@ -183,16 +183,45 @@ async def hexagon(request: HexagonRequest, settings: Settings = Depends(get_sett
     return HexagonResponse(learning=50, physical=50, social=50, emotion=50, creativity=50, habit=50)
 
 
+@router.post("/hexagon/calculate", response_model=HexagonResponse)
+async def hexagon_calculate(request: HexagonRequest, settings: Settings = Depends(get_settings)):
+    """AI 기반 6각형 역량 자동 산출 및 저장"""
+    db = SupabaseService()
+    records = db.get_recent_records(request.child_id, days=90)
+    reading = db.get_reading_logs_for_period(request.child_id, months=3)
+    growth = db.get_growth_metrics(request.child_id, months=3)
+    schedules = db.get_today_schedules(request.child_id)
+    sched_count = len(schedules) + 7  # rough proxy for schedule adherence
+
+    ai = OpenAIService(settings.openai_api_key)
+    scores = await ai.calculate_hexagon(records, reading, growth, sched_count)
+
+    db.save_hexagon_scores(
+        child_id=request.child_id,
+        learning=scores["learning"],
+        physical=scores["physical"],
+        social=scores["social"],
+        emotion=scores["emotion"],
+        creativity=scores["creativity"],
+        habit=scores["habit"],
+    )
+
+    return HexagonResponse(**scores)
+
+
 @router.post("/growth-advice", response_model=GrowthAdviceResponse)
 async def growth_advice(request: GrowthAdviceRequest, settings: Settings = Depends(get_settings)):
     ai = OpenAIService(settings.openai_api_key)
     areas_text = ", ".join(request.weak_areas) if request.weak_areas else "전반적 개선"
 
     prompt = f"""아이의 부족한 영역({areas_text})에 대한 개선 조언을 작성해주세요.
-200자 이내, 구체적인 활동 3가지를 추천해주세요."""
+200자 이내 종합 조언 + 구체적인 활동 3가지를 번호로 나열해주세요.
+예: 1. ~ 2. ~ 3. ~"""
 
     response = await ai.chat(prompt)
-    return GrowthAdviceResponse(advice=response, recommendations=[])
+    import re
+    recs = re.findall(r"\d+\.\s*([^\n\d]+)", response)
+    return GrowthAdviceResponse(advice=response, recommendations=recs[:5] if recs else [])
 
 
 @router.post("/auto-tag")

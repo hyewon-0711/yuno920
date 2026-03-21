@@ -1,0 +1,78 @@
+.section {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.loading {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-5);
+}
+
+.chart {
+  min-height: 260px;
+}
+
+.btnRow {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.sliderRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sliderRow label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.sliderWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sliderWrap input[type="range"] {
+  flex: 1;
+  height: 8px;
+  accent-color: var(--tab-growth);
+}
+
+.sliderWrap span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tab-growth);
+  min-width: 32px;
+}

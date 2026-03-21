@@ -11,7 +11,7 @@ import styles from "./page.module.css";
 interface Milestone {
   id: string;
   title: string;
-  achieved_date: string;
+  milestone_date: string;
   category: string;
   description: string | null;
   photo_url: string | null;
@@ -23,7 +23,7 @@ const milestoneCategories = [
   { key: "language", emoji: "🗣️", label: "언어" },
   { key: "social", emoji: "👫", label: "사회성" },
   { key: "emotion", emoji: "💛", label: "감정" },
-  { key: "daily", emoji: "🏠", label: "일상생활" },
+  { key: "habit", emoji: "🏠", label: "일상생활" },
 ];
 
 export default function MilestonesPage() {
@@ -49,7 +49,7 @@ export default function MilestonesPage() {
       .from("milestones")
       .select("*")
       .eq("child_id", child.id)
-      .order("achieved_date", { ascending: false });
+      .order("milestone_date", { ascending: false });
     if (data) setMilestones(data as Milestone[]);
     setLoading(false);
   }, [child]);
@@ -93,7 +93,7 @@ export default function MilestonesPage() {
       child_id: child.id,
       title: title.trim(),
       category,
-      achieved_date: achievedDate,
+      milestone_date: achievedDate,
       description: description.trim() || null,
       photo_url: photoUrl,
     });
@@ -145,7 +145,7 @@ export default function MilestonesPage() {
                   <div className={styles.cardBody}>
                     <div className={styles.cardHeader}>
                       <h3 className={styles.cardTitle}>{m.title}</h3>
-                      <span className={styles.cardDate}>{m.achieved_date}</span>
+                      <span className={styles.cardDate}>{m.milestone_date}</span>
                     </div>
                     <span className={styles.catBadge}>{ci.label}</span>
                     {m.description && <p className={styles.cardDesc}>{m.description}</p>}

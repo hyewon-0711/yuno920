@@ -133,3 +133,54 @@ class OpenAIService:
             return json.loads(response.choices[0].message.content or "{}")
         except json.JSONDecodeError:
             return {"summary": "오늘의 기록을 요약할 수 없습니다.", "keywords": []}
+
+    async def calculate_hexagon(
+        self,
+        records: list[dict],
+        reading_logs: list[dict],
+        growth_metrics: list[dict],
+        schedules_count: int,
+    ) -> dict:
+        """6각형 역량 점수 AI 산출 (0~100)"""
+        record_preview = ", ".join((r.get("content", "") or "")[:30] for r in records[:5]) if records else ""
+        record_summary = f"기록 {len(records)}건" + (f": {record_preview}..." if record_preview else "")
+        reading_summary = f"독서 {len(reading_logs)}건, 총 {sum(r.get('duration_minutes', 0) for r in reading_logs)}분" if reading_logs else "독서 없음"
+        growth_summary = f"성장 기록 {len(growth_metrics)}건 (키/몸무게/SR)" if growth_metrics else "성장 기록 없음"
+
+        prompt = f"""아이의 성장 데이터를 분석하여 6개 영역 역량 점수(0~100)를 산출하세요.
+
+데이터:
+- 일상 기록: {record_summary}
+- 독서: {reading_summary}
+- 성장 지표: {growth_summary}
+- 일정 이행: {schedules_count}건
+
+6개 영역: learning(학습), physical(신체), social(사회성), emotion(감정), creativity(창의성), habit(습관)
+
+규칙:
+- 데이터가 없으면 50점
+- 각 영역 0~100 정수
+- JSON만 출력: {{"learning": 60, "physical": 70, "social": 55, "emotion": 65, "creativity": 50, "habit": 45}}
+"""
+        response = await self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "6각형 역량 분석 AI입니다. JSON만 출력하세요."},
+                {"role": "user", "content": prompt},
+            ],
+            response_format={"type": "json_object"},
+        )
+
+        import json
+        try:
+            result = json.loads(response.choices[0].message.content or "{}")
+            return {
+                "learning": min(100, max(0, int(result.get("learning", 50)))),
+                "physical": min(100, max(0, int(result.get("physical", 50)))),
+                "social": min(100, max(0, int(result.get("social", 50)))),
+                "emotion": min(100, max(0, int(result.get("emotion", 50)))),
+                "creativity": min(100, max(0, int(result.get("creativity", 50)))),
+                "habit": min(100, max(0, int(result.get("habit", 50)))),
+            }
+        except (json.JSONDecodeError, ValueError, TypeError):
+            return {"learning": 50, "physical": 50, "social": 50, "emotion": 50, "creativity": 50, "habit": 50}

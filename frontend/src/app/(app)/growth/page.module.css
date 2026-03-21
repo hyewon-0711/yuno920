@@ -3,6 +3,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  padding-bottom: calc(var(--space-8) + 80px);
+}
+
+.greeting {
+  margin-bottom: var(--space-2);
+}
+
+.greeting h2 {
+  margin-bottom: var(--space-1);
 }
 
 .section {

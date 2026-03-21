@@ -104,3 +104,47 @@ class SupabaseService:
             .execute()
         )
         return res.data[0] if res.data else None
+
+    def save_hexagon_scores(
+        self,
+        child_id: str,
+        learning: int,
+        physical: int,
+        social: int,
+        emotion: int,
+        creativity: int,
+        habit: int,
+    ):
+        self.client.table("hexagon_scores").insert({
+            "child_id": child_id,
+            "learning": learning,
+            "physical": physical,
+            "social": social,
+            "emotion": emotion,
+            "creativity": creativity,
+            "habit": habit,
+        }).execute()
+
+    def get_growth_metrics(self, child_id: str, months: int = 12) -> list[dict]:
+        start = (date.today() - timedelta(days=months * 31)).isoformat()
+        res = (
+            self.client.table("growth_metrics")
+            .select("*")
+            .eq("child_id", child_id)
+            .gte("recorded_at", start)
+            .order("recorded_at")
+            .execute()
+        )
+        return res.data or []
+
+    def get_reading_logs_for_period(self, child_id: str, months: int = 6) -> list[dict]:
+        start = (date.today() - timedelta(days=months * 31)).isoformat()
+        res = (
+            self.client.table("reading_logs")
+            .select("*")
+            .eq("child_id", child_id)
+            .gte("read_date", start)
+            .order("read_date")
+            .execute()
+        )
+        return res.data or []
