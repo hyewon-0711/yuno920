@@ -10,4 +10,5 @@
   color: var(--text-tertiary);
   text-align: center;
   font-size: 14px;
+  margin-bottom: var(--space-6);
 }

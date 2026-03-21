@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChild } from "@/hooks/useChild";
@@ -15,20 +15,27 @@ import styles from "./page.module.css";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const redirectingRef = useRef(false);
   const { user, loading: authLoading } = useAuth();
   const { child, loading: childLoading } = useChild();
   const { schedules, loading: schedLoading, addSchedule, deleteSchedule } = useSchedules(child?.id);
   const { reading, loading: readingLoading } = useReadingToday(child?.id);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/auth/login");
+    if (authLoading) return;
+    if (!user) {
+      if (!redirectingRef.current) {
+        redirectingRef.current = true;
+        router.replace("/auth/login");
+      }
+      return;
     }
-  }, [authLoading, user, router]);
-
-  useEffect(() => {
-    if (!authLoading && user && !childLoading && !child) {
-      router.push("/onboarding");
+    if (childLoading) return;
+    if (!child) {
+      if (!redirectingRef.current) {
+        redirectingRef.current = true;
+        router.replace("/onboarding");
+      }
     }
   }, [authLoading, user, childLoading, child, router]);
 

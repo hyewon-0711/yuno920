@@ -24,14 +24,14 @@ export default function GrowthPage() {
   const { data: readingData, loading: readingLoading } = useReadingGrowth(child?.id, 6);
 
   useEffect(() => {
-    if (!authLoading && !user) {
-      router.push("/auth/login");
+    if (authLoading) return;
+    if (!user) {
+      router.replace("/auth/login");
+      return;
     }
-  }, [authLoading, user, router]);
-
-  useEffect(() => {
-    if (!authLoading && user && !childLoading && !child) {
-      router.push("/onboarding");
+    if (childLoading) return;
+    if (!child) {
+      router.replace("/onboarding");
     }
   }, [authLoading, user, childLoading, child, router]);
 

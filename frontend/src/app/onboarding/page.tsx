@@ -22,13 +22,17 @@ export default function OnboardingPage() {
   const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const redirectedRef = useRef(false);
+
   useEffect(() => {
+    if (redirectedRef.current) return;
     let cancelled = false;
 
     async function checkChild() {
       const { data: { user } } = await supabase.auth.getUser();
       if (cancelled) return;
       if (!user) {
+        redirectedRef.current = true;
         router.replace("/auth/login");
         return;
       }
@@ -44,6 +48,7 @@ export default function OnboardingPage() {
         return;
       }
       if (data && data.length > 0) {
+        redirectedRef.current = true;
         router.replace("/dashboard");
         return;
       }
@@ -54,7 +59,6 @@ export default function OnboardingPage() {
     return () => {
       cancelled = true;
     };
-    // router는 Next에서 안정적이나, 의존성 변경 시 중복 요청으로 깜빡임 방지용 cleanup
   }, [router]);
 
   if (checking) {

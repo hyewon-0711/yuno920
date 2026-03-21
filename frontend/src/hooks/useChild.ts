@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -18,29 +18,44 @@ export function useChild() {
   const { user } = useAuth();
   const [child, setChild] = useState<Child | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasFetchedForUser = useRef(false);
 
   useEffect(() => {
     if (!user) {
+      hasFetchedForUser.current = false;
+      setChild(null);
       setLoading(false);
       return;
     }
 
+    hasFetchedForUser.current = false;
+    setLoading(true);
+
+    let cancelled = false;
+
     async function fetchChild() {
-      // 온보딩(/onboarding)과 동일하게 limit(1)만 사용 — .single()은
-      // 행 0개·2개 이상일 때 에러로 data=null이 되어 child가 영구 null이 될 수 있음
-      // → 대시보드는 "아이 없음"으로 /onboarding, 온보딩은 "아이 있음"으로 /dashboard 왕복(깜빡임)
       const { data, error } = await supabase
         .from("children")
         .select("*")
         .eq("user_id", user!.id)
         .limit(1);
 
+      if (cancelled) return;
+      hasFetchedForUser.current = true;
       if (!error && data?.length) setChild(data[0] as Child);
+      else setChild(null);
       setLoading(false);
     }
 
     fetchChild();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
-  return { child, loading };
+  // user가 있는데 child가 null이고 아직 fetch 완료 전이면 loading으로 간주 (리다이렉트 루프 방지)
+  const effectiveLoading =
+    loading || (!!user && child === null && !hasFetchedForUser.current);
+
+  return { child, loading: effectiveLoading };
 }
