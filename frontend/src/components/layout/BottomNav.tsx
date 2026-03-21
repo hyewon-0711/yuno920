@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Home, TrendingUp, PenSquare, Gamepad2, Sparkles } from "lucide-react";
+import { Home, TrendingUp, PenSquare, Gamepad2, Sparkles, Settings } from "lucide-react";
 import styles from "./BottomNav.module.css";
 
 const tabs = [
@@ -11,6 +11,7 @@ const tabs = [
   { href: "/records", label: "Record", icon: PenSquare, color: "var(--tab-record)" },
   { href: "/play", label: "Play", icon: Gamepad2, color: "var(--tab-play)" },
   { href: "/insight", label: "Insight", icon: Sparkles, color: "var(--tab-insight)" },
+  { href: "/settings", label: "설정", icon: Settings, color: "var(--text-secondary)" },
 ];
 
 export default function BottomNav() {
