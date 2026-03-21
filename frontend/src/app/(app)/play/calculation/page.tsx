@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from "react";
 import AppHeader from "@/components/layout/AppHeader";
+import CelebrationOverlay from "@/components/ui/CelebrationOverlay";
 import styles from "./page.module.css";
 
 type Op = "+" | "-" | "×" | "÷";
@@ -91,6 +92,7 @@ export default function CalculationGamePage() {
   const [totalCorrect, setTotalCorrect] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
+  const [showCelebration, setShowCelebration] = useState(false);
   const [question, setQuestion] = useState(() => {
     const config = LEVELS.find((l) => l.level === 1) ?? LEVELS[0];
     return generateQuestion(config);
@@ -122,6 +124,7 @@ export default function CalculationGamePage() {
       setFeedback("correct");
 
       if (newCombo >= LEVEL_UP_SCORE && currentLevel < LEVELS.length) {
+        setShowCelebration(true);
         setCurrentLevel((l) => l + 1);
         setCombo(0);
       } else {
@@ -140,6 +143,7 @@ export default function CalculationGamePage() {
 
   return (
     <>
+      <CelebrationOverlay show={showCelebration} onComplete={() => setShowCelebration(false)} />
       <AppHeader title="계산 게임" showBack backHref="/play" />
       <div className={styles.page}>
         <div className={styles.info}>

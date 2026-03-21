@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import AppHeader from "@/components/layout/AppHeader";
+import CelebrationOverlay from "@/components/ui/CelebrationOverlay";
 import styles from "./page.module.css";
 
 const EMOJI_POOL = [
@@ -65,6 +66,7 @@ export default function MemoryGamePage() {
   const [attempts, setAttempts] = useState(0);
   const [timeLeft, setTimeLeft] = useState(120);
   const [shakeCards, setShakeCards] = useState<Set<number>>(new Set());
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const config = LEVELS.find((l) => l.level === currentLevel) ?? LEVELS[LEVELS.length - 1];
 
@@ -143,8 +145,17 @@ export default function MemoryGamePage() {
   useEffect(() => {
     if (phase === "playing" && allMatched) {
       setPhase("finished");
+      setShowCelebration(true);
     }
   }, [phase, allMatched, config.pairs]);
+
+  const handleGoNextLevel = () => {
+    if (currentLevel < LEVELS.length) {
+      setCurrentLevel((l) => l + 1);
+    } else {
+      setCurrentLevel(1);
+    }
+  };
 
   const score = useMemo(() => {
     if (phase !== "finished") return 0;
@@ -163,16 +174,14 @@ export default function MemoryGamePage() {
     setShakeCards(new Set());
   };
 
-  const goNextLevel = () => {
-    if (currentLevel < LEVELS.length) {
-      setCurrentLevel((l) => l + 1);
-    } else {
-      setCurrentLevel(1);
-    }
-  };
 
   return (
     <>
+      <CelebrationOverlay
+        show={showCelebration}
+        onComplete={() => setShowCelebration(false)}
+        message="🎉 클리어! 🎉"
+      />
       <AppHeader title="기억력 게임" showBack backHref="/play" />
       <div className={styles.page}>
         <div className={styles.info}>
@@ -205,7 +214,7 @@ export default function MemoryGamePage() {
               <button type="button" className={styles.resultBtn} onClick={startNewGame}>
                 다시 하기
               </button>
-              <button type="button" className={styles.resultBtnPrimary} onClick={goNextLevel}>
+              <button type="button" className={styles.resultBtnPrimary} onClick={handleGoNextLevel}>
                 {currentLevel < LEVELS.length ? "다음 레벨" : "처음부터"}
               </button>
             </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AppHeader from "@/components/layout/AppHeader";
+import CelebrationOverlay from "@/components/ui/CelebrationOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChild } from "@/hooks/useChild";
 import { api } from "@/lib/api";
@@ -35,6 +36,15 @@ export default function QuizPage() {
   const { user, loading: authLoading } = useAuth();
   const { child, loading: childLoading } = useChild();
 
+  const [phase, setPhase] = useState<Phase>("category");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [error, setError] = useState("");
+  const [showCelebration, setShowCelebration] = useState(false);
+
   useEffect(() => {
     if (authLoading) return;
     if (!user) {
@@ -57,14 +67,6 @@ export default function QuizPage() {
       </>
     );
   }
-
-  const [phase, setPhase] = useState<Phase>("category");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [error, setError] = useState("");
 
   const startQuiz = async (categoryId: string) => {
     if (!child?.id) {
@@ -107,7 +109,12 @@ export default function QuizPage() {
       setCurrentIndex((i) => i + 1);
       setSelectedAnswer(null);
     } else {
+      const isLastCorrect = selectedAnswer === questions[currentIndex]?.answer;
+      const finalScore = correctCount + (isLastCorrect ? 1 : 0);
       setPhase("result");
+      if (finalScore === questions.length) {
+        setShowCelebration(true);
+      }
     }
   };
 
@@ -121,6 +128,11 @@ export default function QuizPage() {
 
   return (
     <>
+      <CelebrationOverlay
+        show={showCelebration}
+        onComplete={() => setShowCelebration(false)}
+        message="🎉 완벽해요! 🎉"
+      />
       <AppHeader title="상식 퀴즈" showBack backHref="/play" />
       <div className={styles.page}>
         {phase === "category" && (
