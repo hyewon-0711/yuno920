@@ -23,6 +23,15 @@ class ChatResponse(BaseModel):
     reply: str
 
 
+class ChatAssistantRequest(BaseModel):
+    child_id: str
+    message: str
+
+
+class ChatAssistantResponse(BaseModel):
+    reply: str
+
+
 # ========== AI Daily Summary ==========
 class DailySummaryRequest(BaseModel):
     child_id: str

@@ -5,6 +5,7 @@ from app.services.openai_service import OpenAIService
 from app.services.supabase_service import SupabaseService
 from app.models.schemas import (
     ChatRequest, ChatResponse,
+    ChatAssistantRequest, ChatAssistantResponse,
     DailySummaryRequest, DailySummaryResponse,
     ReportRequest, ReportResponse,
     CoachingRequest, CoachingResponse,
@@ -27,6 +28,39 @@ async def chat(request: ChatRequest, settings: Settings = Depends(get_settings))
     service = OpenAIService(settings.openai_api_key)
     result = await service.chat(request.message)
     return ChatResponse(reply=result)
+
+
+@router.post("/chat-assistant", response_model=ChatAssistantResponse)
+async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Depends(get_settings)):
+    """아이 데이터(일정, 기록, 독서) 기반 컨텍스트로 질문에 답변"""
+    db = SupabaseService()
+    child = db.get_child(request.child_id)
+    if not child:
+        raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
+
+    today = date.today()
+    today_str = today.strftime("%Y년 %m월 %d일 ") + ["월", "화", "수", "목", "금", "토", "일"][today.weekday()] + "요일"
+
+    schedules = db.get_today_schedules(request.child_id)
+    records_today = db.get_records_by_date(request.child_id, today)
+    reading_today = db.get_reading_logs_by_date(request.child_id, today)
+    recent_records = db.get_recent_records(request.child_id, days=3)
+    recent_reading = db.get_recent_reading_logs(request.child_id, days=3)
+
+    child_age = _get_child_age(child["birth_date"])
+    ai = OpenAIService(settings.openai_api_key)
+    reply = await ai.chat_with_context(
+        child_name=child["name"],
+        child_age=child_age,
+        today_str=today_str,
+        schedules=schedules,
+        records_today=records_today,
+        reading_today=reading_today,
+        recent_records=recent_records,
+        recent_reading=recent_reading,
+        message=request.message,
+    )
+    return ChatAssistantResponse(reply=reply)
 
 
 @router.post("/daily-summary", response_model=DailySummaryResponse)

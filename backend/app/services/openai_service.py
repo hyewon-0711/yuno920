@@ -15,6 +15,62 @@ class OpenAIService:
         )
         return response.choices[0].message.content or ""
 
+    async def chat_with_context(
+        self,
+        child_name: str,
+        child_age: int,
+        today_str: str,
+        schedules: list[dict],
+        records_today: list[dict],
+        reading_today: list[dict],
+        recent_records: list[dict],
+        recent_reading: list[dict],
+        message: str,
+    ) -> str:
+        """아이 데이터 기반 컨텍스트로 질문에 답변"""
+        sched_lines = []
+        for s in schedules:
+            t = s.get("start_time", "")[:16].replace("T", " ")
+            sched_lines.append(f"- {t} {s.get('title', '')}")
+        schedule_text = "\n".join(sched_lines) if sched_lines else "등록된 일정 없음"
+
+        rec_lines = [f"- {r.get('content', '')[:80]} (감정: {r.get('mood', '없음')})" for r in records_today]
+        records_text = "\n".join(rec_lines) if rec_lines else "오늘 기록 없음"
+
+        read_lines = [f"- {r.get('title', '')} ({r.get('duration_minutes', 0)}분)" for r in reading_today]
+        reading_text = "\n".join(read_lines) if read_lines else "오늘 독서 기록 없음"
+
+        recent_rec = ", ".join(r.get("content", "")[:30] for r in recent_records[:3]) if recent_records else "없음"
+        recent_read = ", ".join(r.get("title", "") for r in recent_reading[:3]) if recent_reading else "없음"
+
+        system = f"""당신은 {child_name}의 일상을 돕는 AI 도우미입니다.
+오늘 날짜: {today_str}
+아이 정보: {child_name}, 만 {child_age}세
+
+[오늘 일정]
+{schedule_text}
+
+[오늘 기록]
+{records_text}
+
+[오늘 독서]
+{reading_text}
+
+[최근 3일 이내 기록 요약] {recent_rec}
+[최근 독서] {recent_read}
+
+규칙: 존댓말 사용, 150자 이내로 간결하게. 일정/기록/독서가 있으면 반드시 참고해 답변.
+"""
+
+        response = await self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": message},
+            ],
+        )
+        return response.choices[0].message.content or ""
+
     async def generate_coaching(
         self,
         child_name: str,
