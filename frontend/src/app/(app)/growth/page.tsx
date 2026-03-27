@@ -19,7 +19,8 @@ export default function GrowthPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const { child, loading: childLoading } = useChild();
-  const { physical, learning, loading: metricsLoading, addPhysical, addLearning } = useGrowthMetrics(child?.id, 12);
+  const { physical, learning, loading: metricsLoading, loadError: metricsLoadError, addPhysical, addLearning } =
+    useGrowthMetrics(child?.id);
   const { scores, loading: hexagonLoading, calculateWithAI, saveManual, LABELS } = useHexagon(child?.id);
   const { data: readingData, loading: readingLoading } = useReadingGrowth(child?.id, 6);
 
@@ -58,6 +59,22 @@ export default function GrowthPage() {
             신체, 학습, 독서 데이터를 추적하고 AI 분석을 받아보세요
           </p>
         </section>
+
+        {metricsLoadError && (
+          <p
+            className="text-body-sm"
+            style={{
+              margin: "0 0 var(--space-4)",
+              padding: "var(--space-3)",
+              borderRadius: "var(--radius-md)",
+              background: "var(--bg-muted)",
+              color: "var(--action-destructive, #b91c1c)",
+            }}
+            role="alert"
+          >
+            성장 기록을 불러오지 못했습니다: {metricsLoadError}
+          </p>
+        )}
 
         <PhysicalGrowthSection
           data={physical}

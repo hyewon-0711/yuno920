@@ -8,6 +8,11 @@ import EmptyState from "@/components/ui/EmptyState";
 import type { GrowthMetric } from "@/hooks/useGrowthMetrics";
 import styles from "./LearningSection.module.css";
 
+function displayMemo(m: string | null | undefined): string | null {
+  const t = m?.trim();
+  return t ? t : null;
+}
+
 function levelLabel(score: number): string {
   if (score >= 80) return "우수";
   if (score >= 60) return "양호";
@@ -27,29 +32,43 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
   const [recordedAt, setRecordedAt] = useState(new Date().toISOString().split("T")[0]);
   const [memo, setMemo] = useState("");
   const [saving, setSaving] = useState(false);
+  const [formError, setFormError] = useState("");
 
-  const chartData = data
+  const learningRows = data
     .filter((r) => r.sr_score != null)
-    .map((r) => ({ date: r.recorded_at, score: Number(r.sr_score) }))
-    .sort((a, b) => a.date.localeCompare(b.date))
+    .sort((a, b) => a.recorded_at.localeCompare(b.recorded_at));
+
+  const chartData = learningRows
+    .map((r) => ({
+      date: r.recorded_at,
+      score: Number(r.sr_score),
+      memo: displayMemo(r.memo) ?? "",
+    }))
     .slice(-10);
 
-  const latest = data.filter((r) => r.sr_score != null).sort(
-    (a, b) => b.recorded_at.localeCompare(a.recorded_at)
-  )[0];
+  const latest = [...learningRows].sort((a, b) => b.recorded_at.localeCompare(a.recorded_at))[0];
+  const latestMemo = latest ? displayMemo(latest.memo) : null;
+
+  const entriesDesc = [...learningRows].sort((a, b) => b.recorded_at.localeCompare(a.recorded_at));
 
   const handleSave = async () => {
+    setFormError("");
     const s = parseInt(srScore, 10);
     if (isNaN(s) || s < 0 || s > 100) {
-      alert("학습 점수는 0~100 범위로 입력해주세요");
+      setFormError("학습 점수는 0~100 범위로 입력해주세요");
       return;
     }
     setSaving(true);
-    await onAdd(s, recordedAt, memo || undefined);
-    setShowModal(false);
-    setSrScore("");
-    setMemo("");
-    setSaving(false);
+    try {
+      await onAdd(s, recordedAt, memo || undefined);
+      setShowModal(false);
+      setSrScore("");
+      setMemo("");
+    } catch (e) {
+      setFormError(e instanceof Error ? e.message : "저장에 실패했습니다");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -73,9 +92,12 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
       ) : (
         <>
           {latest && (
-            <div className={styles.summary}>
-              <span>최근: {latest.sr_score}점</span>
-              <span className={styles.grade}>{levelLabel(Number(latest.sr_score))}</span>
+            <div className={styles.summaryBlock}>
+              <div className={styles.summary}>
+                <span>최근: {latest.sr_score}점</span>
+                <span className={styles.grade}>{levelLabel(Number(latest.sr_score))}</span>
+              </div>
+              {latestMemo && <p className={styles.latestMemo}>{latestMemo}</p>}
             </div>
           )}
           {chartData.length >= 1 ? (
@@ -86,22 +108,78 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} stroke="var(--text-tertiary)" />
                   <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} stroke="var(--text-tertiary)" />
                   <Tooltip
-                    contentStyle={{ background: "var(--bg-card)", borderRadius: "var(--radius-md)" }}
+                    content={({ active, payload }) => {
+                      if (!active || !payload?.length) return null;
+                      const d = payload[0].payload as { date: string; score: number; memo: string };
+                      return (
+                        <div
+                          style={{
+                            background: "var(--bg-card)",
+                            borderRadius: "var(--radius-md)",
+                            padding: "8px 10px",
+                            border: "1px solid var(--border-light)",
+                            fontSize: 13,
+                            maxWidth: 280,
+                          }}
+                        >
+                          <div style={{ fontWeight: 600, marginBottom: 4 }}>{d.date}</div>
+                          <div>{d.score}점</div>
+                          {d.memo ? (
+                            <div style={{ marginTop: 6, color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}>{d.memo}</div>
+                          ) : null}
+                        </div>
+                      );
+                    }}
                   />
                   <Bar dataKey="score" name="점수" fill="var(--tab-growth)" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           ) : null}
+
+          {entriesDesc.length > 0 && (
+            <div className={styles.entries}>
+              <p className={styles.entriesTitle}>기록 목록</p>
+              <ul className={styles.entryList}>
+                {entriesDesc.map((r) => {
+                  const m = displayMemo(r.memo);
+                  return (
+                    <li key={r.id} className={styles.entryItem}>
+                      <div className={styles.entryMeta}>
+                        <span className={styles.entryDate}>{r.recorded_at}</span>
+                        <span>
+                          {r.sr_score}점 · {levelLabel(Number(r.sr_score))}
+                        </span>
+                      </div>
+                      {m && <p className={styles.entryMemo}>{m}</p>}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
         </>
       )}
 
       {showModal && (
-        <Modal title="학습 점수 기록" onClose={() => setShowModal(false)}>
-          <div className={styles.form}>
+        <Modal
+          title="학습 점수 기록"
+          onClose={() => {
+            setShowModal(false);
+            setFormError("");
+          }}
+        >
+          <form
+            className={styles.form}
+            onSubmit={(e) => {
+              e.preventDefault();
+              void handleSave();
+            }}
+          >
             <Input
               label="학습 점수 (0~100)"
               type="number"
+              inputMode="numeric"
               value={srScore}
               onChange={(e) => setSrScore(e.target.value)}
               placeholder="0~100"
@@ -118,10 +196,11 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
               onChange={(e) => setMemo(e.target.value)}
               placeholder="시험 유형 등"
             />
-            <Button onClick={handleSave} loading={saving} disabled={!srScore}>
+            {formError && <p className={styles.formError}>{formError}</p>}
+            <Button type="submit" loading={saving} disabled={!srScore.trim()} fullWidth>
               저장
             </Button>
-          </div>
+          </form>
         </Modal>
       )}
     </section>

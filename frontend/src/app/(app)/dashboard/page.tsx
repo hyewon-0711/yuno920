@@ -9,6 +9,7 @@ import { useReadingToday } from "@/hooks/useReadingToday";
 import AppHeader from "@/components/layout/AppHeader";
 import WeatherSection from "./components/WeatherSection";
 import ScheduleSection from "./components/ScheduleSection";
+import WeeklyTimetableSection from "./components/WeeklyTimetableSection";
 import ReadingSection from "./components/ReadingSection";
 import CoachingSection from "./components/CoachingSection";
 import styles from "./page.module.css";
@@ -71,6 +72,8 @@ export default function DashboardPage() {
           onAdd={addSchedule}
           onDelete={deleteSchedule}
         />
+
+        <WeeklyTimetableSection childId={child.id} />
 
         <CoachingSection childId={child.id} childName={child.name} />
 

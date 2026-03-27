@@ -1,0 +1,158 @@
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: var(--space-4);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.addBtn {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--action-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+}
+
+.muted {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-4);
+}
+
+.error {
+  font-size: 14px;
+  color: var(--action-destructive, #dc2626);
+  margin: 0 0 var(--space-3);
+  padding: var(--space-2);
+  background: var(--bg-muted);
+  border-radius: var(--radius-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(72px, 1fr));
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.dayCol {
+  min-width: 72px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.dayLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-1) 0;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.dayBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 48px;
+}
+
+.slot {
+  font-size: 12px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--surface-primary);
+  border-left: 3px solid var(--action-primary);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+.slotMuted {
+  border-left-color: var(--border-default);
+}
+
+.slotTime {
+  font-weight: 600;
+  opacity: 0.85;
+  margin-bottom: 2px;
+}
+
+.slotTitle {
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.emptyDay {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: center;
+  padding: var(--space-2) 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.dayPick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.dayPickBtn {
+  min-width: 40px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.dayPickBtnActive {
+  border-color: var(--action-primary);
+  color: var(--action-primary);
+  background: var(--surface-primary);
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.formError {
+  margin: 0;
+  font-size: 14px;
+  color: var(--action-destructive);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}

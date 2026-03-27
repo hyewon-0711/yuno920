@@ -14,13 +14,25 @@
 
 .sectionTitle {
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .addBtn {
   font-size: 14px;
   color: var(--brand-primary);
   font-weight: 500;
+}
+
+.muted {
+  color: var(--text-tertiary);
+  font-size: 14px;
+}
+
+.emptyToday {
+  color: var(--text-tertiary);
+  font-size: 14px;
+  text-align: center;
+  padding: var(--space-4) 0;
 }
 
 .list {
@@ -43,7 +55,9 @@
   flex-shrink: 0;
 }
 
-.info { flex: 1; }
+.info {
+  flex: 1;
+}
 
 .time {
   font-size: 13px;
@@ -87,9 +101,10 @@
   font-size: 16px;
 }
 
-.deleteBtn:hover { color: var(--status-error); }
+.deleteBtn:hover {
+  color: var(--status-error);
+}
 
-/* Add Form */
 .addForm {
   display: flex;
   flex-direction: column;
@@ -114,7 +129,21 @@
   outline: none;
 }
 
-.formInput:focus { border-color: var(--border-focus); }
+.formInputTitle {
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  padding: 14px 14px;
+  font-size: 15px;
+  line-height: 1.45;
+  outline: none;
+}
+
+.formInput:focus,
+.formInputTitle:focus {
+  border-color: var(--border-focus);
+}
 
 .formBtn {
   height: 40px;
@@ -127,4 +156,6 @@
   white-space: nowrap;
 }
 
-.formBtn:disabled { opacity: 0.5; }
+.formBtn:disabled {
+  opacity: 0.5;
+}

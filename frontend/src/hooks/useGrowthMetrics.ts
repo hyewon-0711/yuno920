@@ -12,67 +12,117 @@ export interface GrowthMetric {
   memo: string | null;
 }
 
-export function useGrowthMetrics(childId: string | undefined, months = 12) {
+function rowHasPhysical(r: GrowthMetric): boolean {
+  const h = r.height;
+  const w = r.weight;
+  const hasH = h != null && h !== "";
+  const hasW = w != null && w !== "";
+  return hasH || hasW;
+}
+
+function rowHasLearning(r: GrowthMetric): boolean {
+  const s = r.sr_score;
+  return s != null && s !== "";
+}
+
+export function useGrowthMetrics(childId: string | undefined) {
   const [physical, setPhysical] = useState<GrowthMetric[]>([]);
   const [learning, setLearning] = useState<GrowthMetric[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-  const fetch = useCallback(async () => {
-    if (!childId) return;
-    setLoading(true);
-    const start = new Date();
-    start.setMonth(start.getMonth() - months);
-    const startStr = start.toISOString().split("T")[0];
+  const fetch = useCallback(async (opts?: { quiet?: boolean }) => {
+    if (!childId) {
+      if (!opts?.quiet) setLoading(false);
+      return;
+    }
+    if (!opts?.quiet) {
+      setLoading(true);
+      setLoadError(null);
+    }
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("growth_metrics")
       .select("*")
       .eq("child_id", childId)
-      .gte("recorded_at", startStr)
-      .order("recorded_at");
+      .order("recorded_at", { ascending: true });
 
+    if (error) {
+      console.error("growth_metrics fetch:", error.message);
+      setLoadError(error.message);
+      if (!opts?.quiet) setLoading(false);
+      return;
+    }
+
+    setLoadError(null);
     const list = (data || []) as GrowthMetric[];
-    setPhysical(list.filter((r) => r.height != null || r.weight != null));
-    setLearning(list.filter((r) => r.sr_score != null));
-    setLoading(false);
-  }, [childId, months]);
+    setPhysical(list.filter(rowHasPhysical));
+    setLearning(list.filter(rowHasLearning));
+    if (!opts?.quiet) setLoading(false);
+  }, [childId]);
 
   useEffect(() => {
     fetch();
   }, [fetch]);
 
   const addPhysical = async (height: number, weight: number, recordedAt: string, memo?: string) => {
-    if (!childId) return;
-    await supabase.from("growth_metrics").insert({
-      child_id: childId,
-      height,
-      weight,
-      recorded_at: recordedAt,
-      memo: memo || null,
-    });
-    fetch();
+    if (!childId) {
+      throw new Error("아이 정보가 아직 없습니다. 페이지를 새로고침한 뒤 다시 시도해주세요.");
+    }
+    const { data: insertedRows, error } = await supabase
+      .from("growth_metrics")
+      .insert({
+        child_id: childId,
+        height,
+        weight,
+        recorded_at: recordedAt,
+        memo: memo || null,
+      })
+      .select("*");
+    if (error) throw new Error(error.message);
+    await fetch({ quiet: true });
+    const row = (insertedRows?.[0] ?? null) as GrowthMetric | null;
+    if (row && rowHasPhysical(row)) {
+      setPhysical((prev) =>
+        prev.some((x) => x.id === row.id) ? prev : [...prev, row].sort((a, b) => a.recorded_at.localeCompare(b.recorded_at)),
+      );
+    }
   };
 
   const addLearning = async (srScore: number, recordedAt: string, memo?: string) => {
-    if (!childId) return;
-    await supabase.from("growth_metrics").insert({
-      child_id: childId,
-      sr_score: srScore,
-      recorded_at: recordedAt,
-      memo: memo || null,
-    });
-    fetch();
+    if (!childId) {
+      throw new Error("아이 정보가 아직 없습니다. 페이지를 새로고침한 뒤 다시 시도해주세요.");
+    }
+    const { data: insertedRows, error } = await supabase
+      .from("growth_metrics")
+      .insert({
+        child_id: childId,
+        sr_score: srScore,
+        recorded_at: recordedAt,
+        memo: memo || null,
+      })
+      .select("*");
+    if (error) throw new Error(error.message);
+    await fetch({ quiet: true });
+    const row = (insertedRows?.[0] ?? null) as GrowthMetric | null;
+    if (row && rowHasLearning(row)) {
+      setLearning((prev) =>
+        prev.some((x) => x.id === row.id) ? prev : [...prev, row].sort((a, b) => a.recorded_at.localeCompare(b.recorded_at)),
+      );
+    }
   };
 
   const deleteMetric = async (id: string) => {
-    await supabase.from("growth_metrics").delete().eq("id", id);
-    fetch();
+    const { error } = await supabase.from("growth_metrics").delete().eq("id", id);
+    if (error) throw new Error(error.message);
+    await fetch({ quiet: true });
   };
 
   return {
     physical,
     learning,
     loading,
+    loadError,
     addPhysical,
     addLearning,
     deleteMetric,

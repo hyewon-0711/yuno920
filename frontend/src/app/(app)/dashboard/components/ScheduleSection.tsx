@@ -62,26 +62,27 @@ export default function ScheduleSection({ schedules, loading, onAdd, onDelete }:
     <section>
       <div className={styles.card}>
         <div className={styles.header}>
-          <h3 className={styles.sectionTitle}>📅 오늘 일정</h3>
-          <button className={styles.addBtn} onClick={() => setShowForm(!showForm)}>
+          <h3 className={styles.sectionTitle}>📅 오늘의 일정</h3>
+          <button type="button" className={styles.addBtn} onClick={() => setShowForm(!showForm)}>
             {showForm ? "취소" : "+ 추가"}
           </button>
         </div>
 
         {loading ? (
-          <p style={{ color: "var(--text-tertiary)", fontSize: 14 }}>불러오는 중...</p>
+          <p className={styles.muted}>불러오는 중...</p>
         ) : schedules.length === 0 ? (
-          <p style={{ color: "var(--text-tertiary)", fontSize: 14, textAlign: "center", padding: "var(--space-4) 0" }}>
-            오늘 등록된 일정이 없습니다
-          </p>
+          <p className={styles.emptyToday}>오늘 등록된 일정이 없습니다</p>
         ) : (
           <div className={styles.list}>
             {schedules.map((s) => {
               const status = getStatus(s.start_time, s.end_time);
               const remaining = getRemaining(s.start_time);
-              const dotColor = status === "completed" ? "var(--text-disabled)"
-                : status === "ongoing" ? "var(--brand-primary)"
-                : "var(--tab-growth)";
+              const dotColor =
+                status === "completed"
+                  ? "var(--text-disabled)"
+                  : status === "ongoing"
+                    ? "var(--brand-primary)"
+                    : "var(--tab-growth)";
 
               return (
                 <div key={s.id} className={styles.item}>
@@ -94,13 +95,11 @@ export default function ScheduleSection({ schedules, loading, onAdd, onDelete }:
                       {s.title}
                     </span>
                   </div>
-                  {status === "ongoing" && (
-                    <span className={`${styles.badge} ${styles.badgeOngoing}`}>진행 중</span>
-                  )}
-                  {status === "upcoming" && remaining && (
-                    <span className={styles.badge}>{remaining}</span>
-                  )}
-                  <button className={styles.deleteBtn} onClick={() => onDelete(s.id)}>✕</button>
+                  {status === "ongoing" && <span className={`${styles.badge} ${styles.badgeOngoing}`}>진행 중</span>}
+                  {status === "upcoming" && remaining && <span className={styles.badge}>{remaining}</span>}
+                  <button type="button" className={styles.deleteBtn} onClick={() => onDelete(s.id)}>
+                    ✕
+                  </button>
                 </div>
               );
             })}
@@ -110,19 +109,19 @@ export default function ScheduleSection({ schedules, loading, onAdd, onDelete }:
         {showForm && (
           <div className={styles.addForm}>
             <input
-              className={styles.formInput}
+              className={styles.formInputTitle}
               placeholder="일정 제목 (예: 태권도)"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
             <div className={styles.row}>
-              <input
-                className={styles.formInput}
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-              />
-              <button className={styles.formBtn} onClick={handleAdd} disabled={submitting || !title || !time}>
+              <input className={styles.formInput} type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+              <button
+                type="button"
+                className={styles.formBtn}
+                onClick={handleAdd}
+                disabled={submitting || !title || !time}
+              >
                 {submitting ? "..." : "추가"}
               </button>
             </div>
