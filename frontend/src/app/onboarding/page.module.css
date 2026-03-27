@@ -202,4 +202,6 @@
   color: var(--status-error);
   text-align: center;
   padding: var(--space-2) 0;
+  white-space: pre-line;
+  line-height: 1.45;
 }

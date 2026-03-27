@@ -9,6 +9,7 @@ import {
   PENDING_PARENT_INTERESTS_KEY,
   type ParentInterestId,
 } from "@/lib/parentInterests";
+import { getSupabaseErrorMessage, hintForMissingInterestColumn } from "@/lib/supabaseErrors";
 import styles from "./page.module.css";
 
 type Gender = "male" | "female";
@@ -174,7 +175,11 @@ export default function OnboardingPage() {
       router.push("/dashboard");
     } catch (err) {
       console.error(err);
-      setGlobalError("프로필 저장에 실패했습니다. 다시 시도해주세요.");
+      const msg = getSupabaseErrorMessage(err);
+      const hint = hintForMissingInterestColumn(msg);
+      setGlobalError(
+        hint ? `${msg}\n\n${hint}` : `${msg}\n\n문제가 계속되면 잠시 후 다시 시도해 주세요.`,
+      );
       setLoading(false);
     }
   };

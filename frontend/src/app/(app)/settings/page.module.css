@@ -43,6 +43,9 @@
 .err {
   font-size: 13px;
   color: var(--status-error);
+  white-space: pre-line;
+  max-width: 100%;
+  line-height: 1.45;
 }
 
 .muted {
