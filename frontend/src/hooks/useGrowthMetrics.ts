@@ -13,16 +13,11 @@ export interface GrowthMetric {
 }
 
 function rowHasPhysical(r: GrowthMetric): boolean {
-  const h = r.height;
-  const w = r.weight;
-  const hasH = h != null && h !== "";
-  const hasW = w != null && w !== "";
-  return hasH || hasW;
+  return r.height != null || r.weight != null;
 }
 
 function rowHasLearning(r: GrowthMetric): boolean {
-  const s = r.sr_score;
-  return s != null && s !== "";
+  return r.sr_score != null;
 }
 
 export function useGrowthMetrics(childId: string | undefined) {
