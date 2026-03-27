@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import InterestChipRow from "@/components/parent/InterestChipRow";
 import { signUpWithEmail, signInWithOAuth } from "@/lib/auth";
+import { PENDING_PARENT_INTERESTS_KEY, type ParentInterestId } from "@/lib/parentInterests";
 import styles from "../login/page.module.css";
 
 export default function SignupPage() {
@@ -13,6 +15,7 @@ export default function SignupPage() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [parentInterests, setParentInterests] = useState<ParentInterestId[]>([]);
 
   const validate = (): string | null => {
     if (name.length < 2) return "이름은 2자 이상 입력해주세요.";
@@ -43,6 +46,11 @@ export default function SignupPage() {
       }
       setLoading(false);
     } else {
+      try {
+        sessionStorage.setItem(PENDING_PARENT_INTERESTS_KEY, JSON.stringify(parentInterests));
+      } catch {
+        /* ignore */
+      }
       router.push("/onboarding");
     }
   };
@@ -111,6 +119,12 @@ export default function SignupPage() {
             onChange={(e) => setPasswordConfirm(e.target.value)}
             required
           />
+        </div>
+
+        <div className={styles.inputGroup}>
+          <label className={styles.label}>부모 관심사 (선택 · 최대 6개)</label>
+          <p className={styles.interestHint}>Insight 맞춤 뉴스에 반영돼요. 나중에 설정에서 바꿀 수 있어요.</p>
+          <InterestChipRow selected={parentInterests} onChange={setParentInterests} disabled={loading} />
         </div>
 
         {error && <p className={styles.error}>{error}</p>}

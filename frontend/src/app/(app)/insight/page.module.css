@@ -11,6 +11,13 @@
   gap: var(--space-3);
 }
 
+.sectionLead {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  line-height: 1.45;
+  margin: calc(var(--space-2) * -1) 0 0;
+}
+
 .aiCard {
   background: var(--surface-info);
   border: 1px solid rgba(99, 102, 241, 0.2);

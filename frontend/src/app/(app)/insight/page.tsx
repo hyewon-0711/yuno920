@@ -1,6 +1,7 @@
 "use client";
 
 import AppHeader from "@/components/layout/AppHeader";
+import ParentTrendsSection from "./components/ParentTrendsSection";
 import styles from "./page.module.css";
 
 export default function InsightPage() {
@@ -8,6 +9,14 @@ export default function InsightPage() {
     <>
       <AppHeader title="Insight" />
       <div className={styles.page}>
+        <section className={styles.section}>
+          <h3 className="text-h3">🏷 부모 관심사 · 데일리 트렌드</h3>
+          <p className={styles.sectionLead}>
+            가입·온보딩에서 고른 태그를 바탕으로 오늘 관련 뉴스 헤드라인을 모아둡니다.
+          </p>
+          <ParentTrendsSection />
+        </section>
+
         <section className={styles.section}>
           <h3 className="text-h3">✨ 하루 요약</h3>
           <div className={styles.aiCard}>

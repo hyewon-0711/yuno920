@@ -2,7 +2,13 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import InterestChipRow from "@/components/parent/InterestChipRow";
 import { supabase } from "@/lib/supabase";
+import {
+  normalizeInterestIds,
+  PENDING_PARENT_INTERESTS_KEY,
+  type ParentInterestId,
+} from "@/lib/parentInterests";
 import styles from "./page.module.css";
 
 type Gender = "male" | "female";
@@ -21,6 +27,7 @@ export default function OnboardingPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [parentInterests, setParentInterests] = useState<ParentInterestId[]>([]);
 
   const redirectedRef = useRef(false);
 
@@ -60,6 +67,22 @@ export default function OnboardingPage() {
       cancelled = true;
     };
   }, [router]);
+
+  useEffect(() => {
+    if (checking) return;
+    try {
+      const raw = sessionStorage.getItem(PENDING_PARENT_INTERESTS_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as unknown;
+        if (Array.isArray(parsed)) {
+          setParentInterests(normalizeInterestIds(parsed.map((x) => String(x))));
+        }
+        sessionStorage.removeItem(PENDING_PARENT_INTERESTS_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [checking]);
 
   if (checking) {
     return (
@@ -131,6 +154,12 @@ export default function OnboardingPage() {
         }
       }
 
+      const { error: userTagErr } = await supabase
+        .from("users")
+        .update({ parent_interest_tags: parentInterests })
+        .eq("id", user.id);
+      if (userTagErr) throw userTagErr;
+
       const { error: insertErr } = await supabase.from("children").insert({
         user_id: user.id,
         name: name.trim(),
@@ -155,6 +184,14 @@ export default function OnboardingPage() {
       <div className={styles.header}>
         <h1 className={styles.title}>아이 프로필 등록</h1>
         <p className={styles.subtitle}>아이의 기본 정보를 입력해주세요</p>
+      </div>
+
+      <div className={styles.interestBlock}>
+        <p className={styles.interestLabel}>부모 관심사 (선택 · 최대 6개)</p>
+        <p className={styles.interestHint}>
+          Insight에서 고른 주제에 맞는 데일리 뉴스를 모아 보여드려요.
+        </p>
+        <InterestChipRow selected={parentInterests} onChange={setParentInterests} disabled={loading} />
       </div>
 
       <div className={styles.avatarSection}>
