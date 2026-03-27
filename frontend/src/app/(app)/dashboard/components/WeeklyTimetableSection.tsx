@@ -118,10 +118,12 @@ export default function WeeklyTimetableSection({ childId }: Props) {
 
       {loadError && (
         <p className={styles.error} role="alert">
-          불러오기 오류: {loadError}
+          주간 시간표를 불러올 수 없습니다: {loadError}
           <br />
           <span style={{ fontSize: 12 }}>
-            Supabase에 `weekly_timetable` 테이블·RLS가 있는지 확인해주세요. (migrations/003_weekly_timetable.sql)
+            <strong>운영 Supabase</strong>에서 <code style={{ fontSize: 11 }}>003_weekly_timetable.sql</code> ·{" "}
+            <code style={{ fontSize: 11 }}>004_rls_child_owner_fallback.sql</code> 적용 여부를 확인하세요. 테이블이 없으면
+            이 영역이 비어 있습니다.
           </span>
         </p>
       )}
@@ -129,7 +131,18 @@ export default function WeeklyTimetableSection({ childId }: Props) {
       {loading ? (
         <p className={styles.muted}>불러오는 중...</p>
       ) : (
-        <div className={styles.grid}>
+        <>
+          {!loadError && entries.length === 0 && (
+            <p className={styles.emptyBanner}>
+              등록된 주간 일정이 아직 없어요. <strong>+ 추가</strong>로 입력하거나,{" "}
+              <code style={{ fontSize: 11 }}>seed_weekly_timetable_from_sheet.sql</code>로 일괄 입력할 수 있어요. (child_id
+              교체 필요)
+            </p>
+          )}
+          {!loadError && entries.length > 0 && (
+            <span className={styles.gridScrollHint}>좁은 화면에서는 요일이 세로로 쌓입니다. 넓은 화면에서는 7열로 표시됩니다.</span>
+          )}
+          <div className={styles.grid}>
           {WEEKDAY_LABELS.map((label, d) => (
             <div key={d} className={styles.dayCol}>
               <div className={styles.dayLabel}>{label}</div>
@@ -156,6 +169,7 @@ export default function WeeklyTimetableSection({ childId }: Props) {
             </div>
           ))}
         </div>
+        </>
       )}
 
       {showModal && (

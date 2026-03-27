@@ -39,13 +39,7 @@ export function useWeeklyTimetable(childId: string | undefined) {
         setLoading(true);
         setLoadError(null);
       }
-      const { data, error } = await supabase
-        .from("weekly_timetable")
-        .select("*")
-        .eq("child_id", childId)
-        .order("day_of_week", { ascending: true })
-        .order("start_time", { ascending: true })
-        .order("sort_order", { ascending: true });
+      const { data, error } = await supabase.from("weekly_timetable").select("*").eq("child_id", childId);
 
       if (error) {
         console.error("weekly_timetable fetch:", error.message);
@@ -54,7 +48,14 @@ export function useWeeklyTimetable(childId: string | undefined) {
         return;
       }
       setLoadError(null);
-      setEntries((data || []) as WeeklyTimetableEntry[]);
+      const raw = (data || []) as WeeklyTimetableEntry[];
+      raw.sort((a, b) => {
+        if (a.day_of_week !== b.day_of_week) return a.day_of_week - b.day_of_week;
+        const t = a.start_time.localeCompare(b.start_time);
+        if (t !== 0) return t;
+        return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+      });
+      setEntries(raw);
       if (!opts?.quiet) setLoading(false);
     },
     [childId],
