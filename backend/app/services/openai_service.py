@@ -21,6 +21,7 @@ class OpenAIService:
         child_age: int,
         today_str: str,
         schedules: list[dict],
+        weekly_timetable_today: list[dict],
         records_today: list[dict],
         reading_today: list[dict],
         recent_records: list[dict],
@@ -33,6 +34,23 @@ class OpenAIService:
             t = s.get("start_time", "")[:16].replace("T", " ")
             sched_lines.append(f"- {t} {s.get('title', '')}")
         schedule_text = "\n".join(sched_lines) if sched_lines else "등록된 일정 없음"
+
+        def _fmt_time(v) -> str:
+            if v is None:
+                return ""
+            s = str(v)
+            return s[:5] if len(s) >= 5 else s
+
+        wt_lines = []
+        for w in weekly_timetable_today:
+            st = _fmt_time(w.get("start_time"))
+            et = _fmt_time(w.get("end_time"))
+            title = w.get("title") or ""
+            cat = w.get("category") or ""
+            note = (w.get("notes") or "").strip()
+            extra = f" · {note}" if note else ""
+            wt_lines.append(f"- {st}~{et} {title} ({cat}){extra}")
+        weekly_text = "\n".join(wt_lines) if wt_lines else "오늘 요일에 등록된 고정 시간표 없음"
 
         rec_lines = [f"- {r.get('content', '')[:80]} (감정: {r.get('mood', '없음')})" for r in records_today]
         records_text = "\n".join(rec_lines) if rec_lines else "오늘 기록 없음"
@@ -47,6 +65,10 @@ class OpenAIService:
 오늘 날짜: {today_str}
 아이 정보: {child_name}, 만 {child_age}세
 
+[오늘 고정 시간표 (주간 패턴 · 오늘 요일만)]
+반복되는 학원/학교 등 주간 시간표입니다. 일회성 [오늘 일정]과 함께 참고하세요.
+{weekly_text}
+
 [오늘 일정]
 {schedule_text}
 
@@ -59,7 +81,7 @@ class OpenAIService:
 [최근 3일 이내 기록 요약] {recent_rec}
 [최근 독서] {recent_read}
 
-규칙: 존댓말 사용, 150자 이내로 간결하게. 일정/기록/독서가 있으면 반드시 참고해 답변.
+규칙: 존댓말 사용, 150자 이내로 간결하게. 고정 시간표·일정·기록·독서가 있으면 반드시 참고해 답변.
 """
 
         response = await self.client.chat.completions.create(

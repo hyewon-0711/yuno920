@@ -32,7 +32,7 @@ async def chat(request: ChatRequest, settings: Settings = Depends(get_settings))
 
 @router.post("/chat-assistant", response_model=ChatAssistantResponse)
 async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Depends(get_settings)):
-    """아이 데이터(일정, 기록, 독서) 기반 컨텍스트로 질문에 답변"""
+    """아이 데이터(오늘 요일 주간 시간표, 일정, 기록, 독서) 기반 컨텍스트로 질문에 답변"""
     db = SupabaseService()
     child = db.get_child(request.child_id)
     if not child:
@@ -42,6 +42,8 @@ async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Dep
     today_str = today.strftime("%Y년 %m월 %d일 ") + ["월", "화", "수", "목", "금", "토", "일"][today.weekday()] + "요일"
 
     schedules = db.get_today_schedules(request.child_id)
+    dow = today.weekday()
+    weekly_today = db.get_weekly_timetable_for_weekday(request.child_id, dow)
     records_today = db.get_records_by_date(request.child_id, today)
     reading_today = db.get_reading_logs_by_date(request.child_id, today)
     recent_records = db.get_recent_records(request.child_id, days=3)
@@ -54,6 +56,7 @@ async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Dep
         child_age=child_age,
         today_str=today_str,
         schedules=schedules,
+        weekly_timetable_today=weekly_today,
         records_today=records_today,
         reading_today=reading_today,
         recent_records=recent_records,

@@ -30,6 +30,20 @@ class SupabaseService:
         )
         return res.data or []
 
+    def get_weekly_timetable_for_weekday(self, child_id: str, day_of_week: int) -> list[dict]:
+        """주간 고정 시간표 중 특정 요일 (0=월..6=일, Python date.weekday()와 동일)."""
+        res = (
+            self.client.table("weekly_timetable")
+            .select("start_time,end_time,title,category,notes,sort_order")
+            .eq("child_id", child_id)
+            .eq("day_of_week", day_of_week)
+            .order("start_time")
+            .execute()
+        )
+        rows = res.data or []
+        rows.sort(key=lambda r: (str(r.get("start_time") or ""), r.get("sort_order") or 0))
+        return rows
+
     def get_recent_records(self, child_id: str, days: int = 3) -> list[dict]:
         start = (date.today() - timedelta(days=days)).isoformat()
         res = (
