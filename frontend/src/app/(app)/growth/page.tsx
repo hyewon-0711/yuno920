@@ -77,6 +77,7 @@ export default function GrowthPage() {
         )}
 
         <PhysicalGrowthSection
+          childId={child.id}
           data={physical}
           loading={metricsLoading}
           onAdd={addPhysical}

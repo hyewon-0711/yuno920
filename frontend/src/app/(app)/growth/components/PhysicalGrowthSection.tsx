@@ -14,6 +14,7 @@ import {
 import { Button, Input } from "@/components/ui";
 import Modal from "@/components/ui/Modal";
 import EmptyState from "@/components/ui/EmptyState";
+import { api } from "@/lib/api";
 import type { GrowthMetric } from "@/hooks/useGrowthMetrics";
 import styles from "./PhysicalGrowthSection.module.css";
 
@@ -22,13 +23,40 @@ function displayMemo(m: string | null | undefined): string | null {
   return t ? t : null;
 }
 
+/** growth-advice API용 신체 기록 요약 (한 줄 프롬프트) */
+function physicalContextForAi(rows: GrowthMetric[]): string {
+  if (rows.length === 0) {
+    return "신체 측정 기록 없음. 일반적인 연령 대비 신체 발달·생활 습관 조언을 부탁합니다.";
+  }
+  const byDate = [...rows].sort((a, b) => a.recorded_at.localeCompare(b.recorded_at));
+  const first = byDate[0];
+  const last = byDate[byDate.length - 1];
+  const h0 = Number(first.height);
+  const h1 = Number(last.height);
+  const w0 = Number(first.weight);
+  const w1 = Number(last.weight);
+  const parts = [
+    "신체 성장 맞춤 분석 요청",
+    `기록 ${rows.length}건`,
+    `첫 기록 ${first.recorded_at}: ${first.height}cm / ${first.weight}kg`,
+    `최근 ${last.recorded_at}: ${last.height}cm / ${last.weight}kg`,
+  ];
+  if (byDate.length >= 2 && !Number.isNaN(h0) && !Number.isNaN(h1) && !Number.isNaN(w0) && !Number.isNaN(w1)) {
+    const dh = h1 - h0;
+    const dw = w1 - w0;
+    parts.push(`기간 변화: 키 ${dh >= 0 ? "+" : ""}${dh.toFixed(1)}cm, 몸무게 ${dw >= 0 ? "+" : ""}${dw.toFixed(1)}kg`);
+  }
+  return parts.join(" ");
+}
+
 interface Props {
+  childId?: string;
   data: GrowthMetric[];
   loading: boolean;
   onAdd: (height: number, weight: number, recordedAt: string, memo?: string) => Promise<void>;
 }
 
-export default function PhysicalGrowthSection({ data, loading, onAdd }: Props) {
+export default function PhysicalGrowthSection({ childId, data, loading, onAdd }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -36,6 +64,10 @@ export default function PhysicalGrowthSection({ data, loading, onAdd }: Props) {
   const [memo, setMemo] = useState("");
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiAdvice, setAiAdvice] = useState("");
+  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
+  const [aiError, setAiError] = useState("");
 
   const physicalRows = data
     .filter((r) => r.height != null || r.weight != null)
@@ -76,14 +108,54 @@ export default function PhysicalGrowthSection({ data, loading, onAdd }: Props) {
     }
   };
 
+  const handleAiAnalyze = async () => {
+    if (!childId) return;
+    setAiLoading(true);
+    setAiError("");
+    setAiAdvice("");
+    setAiRecommendations([]);
+    try {
+      const ctx = physicalContextForAi(physicalRows);
+      const res = await api.post<{ advice: string; recommendations: string[] }>("/api/ai/growth-advice", {
+        child_id: childId,
+        weak_areas: [ctx],
+      });
+      setAiAdvice(res.advice);
+      setAiRecommendations(res.recommendations || []);
+    } catch (e) {
+      setAiError(e instanceof Error ? e.message : "AI 분석에 실패했습니다");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <section className={styles.section}>
       <div className={styles.header}>
         <h3 className={styles.title}>📏 신체 성장</h3>
-        <Button variant="ghost" size="small" onClick={() => setShowModal(true)}>
-          + 입력
-        </Button>
+        <div className={styles.headerActions}>
+          <Button variant="secondary" size="small" onClick={() => void handleAiAnalyze()} loading={aiLoading} disabled={!childId}>
+            AI 분석
+          </Button>
+          <Button variant="ghost" size="small" onClick={() => setShowModal(true)}>
+            + 입력
+          </Button>
+        </div>
       </div>
+
+      {aiError && <p className={styles.aiError}>{aiError}</p>}
+      {(aiAdvice || aiRecommendations.length > 0) && (
+        <div className={styles.aiResult}>
+          {aiAdvice && <p className={styles.aiAdvice}>{aiAdvice}</p>}
+          {aiRecommendations.length > 0 && (
+            <ul className={styles.aiList}>
+              {aiRecommendations.map((r, i) => (
+                <li key={i}>{r}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {loading ? (
         <p className={styles.loading}>불러오는 중...</p>
