@@ -1,6 +1,7 @@
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from app.config import Settings, get_settings
+from app.dates import today_app
 from app.models.schemas import QuizGenerateRequest, QuizGenerateResponse, QuizQuestion
 from app.services.openai_service import OpenAIService
 from app.services.supabase_service import SupabaseService
@@ -11,7 +12,7 @@ router = APIRouter()
 def _get_child_age(birth_date_str: str) -> int:
     try:
         birth = date.fromisoformat(birth_date_str)
-        today = date.today()
+        today = today_app()
         return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
     except (ValueError, TypeError):
         return 8

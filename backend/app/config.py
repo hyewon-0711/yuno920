@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     supabase_url: str = ""
     supabase_service_role_key: str = ""
+    # 도우미·일정·기록 조회의 '오늘' 기준 (IANA, 예: Asia/Seoul)
+    app_timezone: str = "Asia/Seoul"
 
     model_config = {"env_file": ".env"}
 

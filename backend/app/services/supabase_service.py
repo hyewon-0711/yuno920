@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 from supabase import create_client, Client
 from app.config import get_settings
+from app.dates import local_day_start_end_iso, today_app
 
 
 def get_supabase_client() -> Client:
@@ -17,14 +18,13 @@ class SupabaseService:
         return res.data[0] if res.data else None
 
     def get_today_schedules(self, child_id: str) -> list[dict]:
-        today = date.today().isoformat()
-        tomorrow = (date.today() + timedelta(days=1)).isoformat()
+        start_iso, end_iso = local_day_start_end_iso(today_app())
         res = (
             self.client.table("schedules")
             .select("*")
             .eq("child_id", child_id)
-            .gte("start_time", f"{today}T00:00:00")
-            .lt("start_time", f"{tomorrow}T00:00:00")
+            .gte("start_time", start_iso)
+            .lt("start_time", end_iso)
             .order("start_time")
             .execute()
         )
@@ -45,7 +45,7 @@ class SupabaseService:
         return rows
 
     def get_recent_records(self, child_id: str, days: int = 3) -> list[dict]:
-        start = (date.today() - timedelta(days=days)).isoformat()
+        start = (today_app() - timedelta(days=days)).isoformat()
         res = (
             self.client.table("records")
             .select("*")
@@ -69,7 +69,7 @@ class SupabaseService:
         return res.data or []
 
     def get_recent_reading_logs(self, child_id: str, days: int = 3) -> list[dict]:
-        start = (date.today() - timedelta(days=days)).isoformat()
+        start = (today_app() - timedelta(days=days)).isoformat()
         res = (
             self.client.table("reading_logs")
             .select("*")
@@ -140,7 +140,7 @@ class SupabaseService:
         }).execute()
 
     def get_growth_metrics(self, child_id: str, months: int = 12) -> list[dict]:
-        start = (date.today() - timedelta(days=months * 31)).isoformat()
+        start = (today_app() - timedelta(days=months * 31)).isoformat()
         res = (
             self.client.table("growth_metrics")
             .select("*")
@@ -152,7 +152,7 @@ class SupabaseService:
         return res.data or []
 
     def get_reading_logs_for_period(self, child_id: str, months: int = 6) -> list[dict]:
-        start = (date.today() - timedelta(days=months * 31)).isoformat()
+        start = (today_app() - timedelta(days=months * 31)).isoformat()
         res = (
             self.client.table("reading_logs")
             .select("*")

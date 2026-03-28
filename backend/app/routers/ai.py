@@ -1,6 +1,7 @@
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from app.config import Settings, get_settings
+from app.dates import today_app
 from app.services.openai_service import OpenAIService
 from app.services.supabase_service import SupabaseService
 from app.models.schemas import (
@@ -19,7 +20,7 @@ router = APIRouter()
 
 def _get_child_age(birth_date_str: str) -> int:
     birth = date.fromisoformat(birth_date_str)
-    today = date.today()
+    today = today_app()
     return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
 
 
@@ -38,7 +39,7 @@ async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Dep
     if not child:
         raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
 
-    today = date.today()
+    today = today_app()
     today_str = today.strftime("%Y년 %m월 %d일 ") + ["월", "화", "수", "목", "금", "토", "일"][today.weekday()] + "요일"
 
     schedules = db.get_today_schedules(request.child_id)
