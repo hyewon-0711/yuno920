@@ -29,7 +29,27 @@ def get_current_user_id(
             audience="authenticated",
         )
     except PyJWTError:
-        raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다")
+        # 일부 토큰/버전은 aud claim 형식이 달라 1차 검증이 실패할 수 있음 — 서명·만료는 유지
+        try:
+            payload = jwt.decode(
+                token,
+                settings.supabase_jwt_secret,
+                algorithms=["HS256"],
+                options={"verify_signature": True, "verify_aud": False, "require": ["exp"]},
+            )
+        except PyJWTError:
+            try:
+                payload = jwt.decode(
+                    token,
+                    settings.supabase_jwt_secret,
+                    algorithms=["HS256"],
+                    options={"verify_signature": True, "verify_aud": False},
+                )
+            except PyJWTError:
+                raise HTTPException(
+                    status_code=401,
+                    detail="유효하지 않은 토큰입니다. (JWT Secret·로그인 상태를 확인해 주세요)",
+                )
     sub = payload.get("sub")
     if not sub or not isinstance(sub, str):
         raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다")

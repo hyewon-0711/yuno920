@@ -10,6 +10,23 @@ import styles from "./page.module.css";
 
 type Message = { role: "user" | "assistant"; content: string };
 
+function formatChatApiError(raw: string): string {
+  if (raw.includes("SUPABASE_JWT_SECRET") || /\(POST[^)]*503\)/.test(raw) || raw.includes("503")) {
+    return "서버에 인증 키가 설정되지 않았어요.\nRender(또는 API 호스트)에 환경변수 SUPABASE_JWT_SECRET\n(Supabase → Project Settings → API → JWT Secret)을 등록한 뒤 다시 시도해 주세요.";
+  }
+  if (raw.includes("Failed to fetch") || raw.includes("NetworkError") || raw.includes("Load failed")) {
+    return "서버에 연결하지 못했어요. 인터넷·배포 환경변수 NEXT_PUBLIC_API_URL(백엔드 URL)이 맞는지 확인해 주세요.";
+  }
+  if (raw.includes("403") || raw.includes("권한")) {
+    return "이 아이 데이터에 대한 권한이 없어요. 같은 계정으로 가입·연결됐는지 확인해 주세요.";
+  }
+  if (raw.includes("로그인 세션") || raw.includes("401")) {
+    return "로그인이 만료됐을 수 있어요. 한 번 로그아웃 후 다시 로그인해 보세요.\n\n" + raw;
+  }
+  const short = raw.length > 380 ? raw.slice(0, 380) + "…" : raw;
+  return "응답을 가져오지 못했어요. 아래 메시지를 참고하세요.\n\n" + short;
+}
+
 export default function ChatPage() {
   const router = useRouter();
   const redirectingRef = useRef(false);
@@ -57,10 +74,12 @@ export default function ChatPage() {
         message: text,
       });
       setMessages((prev) => [...prev, { role: "assistant", content: res.reply }]);
-    } catch {
+    } catch (e) {
+      const raw = e instanceof Error ? e.message : "알 수 없는 오류";
+      const friendly = formatChatApiError(raw);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "응답을 불러오는 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요." },
+        { role: "assistant", content: friendly },
       ]);
     } finally {
       setSending(false);

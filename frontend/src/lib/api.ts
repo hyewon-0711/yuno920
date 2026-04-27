@@ -42,21 +42,43 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   return res.json();
 }
 
-async function getAccessToken(): Promise<string | undefined> {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session?.access_token;
+/** 세션 없으면 한 번 refresh 시도 (만료 직전 등) */
+async function getAccessTokenWithRefresh(): Promise<string | undefined> {
+  const { data: { session: s1 } } = await supabase.auth.getSession();
+  if (s1?.access_token) return s1.access_token;
+  const { data, error } = await supabase.auth.refreshSession();
+  if (error) console.warn("auth refreshSession:", error.message);
+  return data.session?.access_token;
 }
 
 /** Supabase access_token으로 보호된 FastAPI 엔드포인트용 */
 export async function postWithAuth<T>(endpoint: string, body: unknown): Promise<T> {
-  const token = await getAccessToken();
-  if (!token) throw new Error("로그인이 필요합니다.");
-  return request<T>(endpoint, { method: "POST", body, token });
+  const token = await getAccessTokenWithRefresh();
+  if (!token) {
+    throw new Error("로그인 세션이 없어요. 로그인한 뒤 다시 시도해 주세요.");
+  }
+  try {
+    return await request<T>(endpoint, { method: "POST", body, token });
+  } catch (first) {
+    const isAuth =
+      first instanceof Error &&
+      (first.message.includes("401") ||
+        first.message.includes("유효하지 않은") ||
+        first.message.includes("로그인이 필요"));
+    if (isAuth) {
+      const { data } = await supabase.auth.refreshSession();
+      const t2 = data.session?.access_token;
+      if (t2) {
+        return request<T>(endpoint, { method: "POST", body, token: t2 });
+      }
+    }
+    throw first;
+  }
 }
 
 export async function getWithAuth<T>(endpoint: string): Promise<T> {
-  const token = await getAccessToken();
-  if (!token) throw new Error("로그인이 필요합니다.");
+  const token = await getAccessTokenWithRefresh();
+  if (!token) throw new Error("로그인 세션이 없어요. 로그인한 뒤 다시 시도해 주세요.");
   return request<T>(endpoint, { token });
 }
 
