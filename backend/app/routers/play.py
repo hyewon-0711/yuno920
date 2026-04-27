@@ -1,5 +1,8 @@
 from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
+
+from app.auth_deps import get_current_user_id
 from app.config import Settings, get_settings
 from app.dates import today_app
 from app.models.schemas import QuizGenerateRequest, QuizGenerateResponse, QuizQuestion
@@ -7,6 +10,12 @@ from app.services.openai_service import OpenAIService
 from app.services.supabase_service import SupabaseService
 
 router = APIRouter()
+
+
+def _require_child_access(user_id: str, child_id: str) -> None:
+    db = SupabaseService()
+    if not db.user_has_child_access(user_id, child_id):
+        raise HTTPException(status_code=403, detail="이 아이에 대한 권한이 없습니다")
 
 
 def _get_child_age(birth_date_str: str) -> int:
@@ -22,7 +31,9 @@ def _get_child_age(birth_date_str: str) -> int:
 async def generate_quiz(
     request: QuizGenerateRequest,
     settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
 ):
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     child = db.get_child(request.child_id)
     child_age = _get_child_age(child.get("birth_date", "") or "") if child else 8

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChild } from "@/hooks/useChild";
-import { api } from "@/lib/api";
+import { postWithAuth } from "@/lib/api";
 import AppHeader from "@/components/layout/AppHeader";
 import styles from "./page.module.css";
 
@@ -52,7 +52,7 @@ export default function ChatPage() {
     setSending(true);
 
     try {
-      const res = await api.post<{ reply: string }>("/api/ai/chat-assistant", {
+      const res = await postWithAuth<{ reply: string }>("/api/ai/chat-assistant", {
         child_id: child.id,
         message: text,
       });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { api } from "@/lib/api";
+import { postWithAuth } from "@/lib/api";
 import styles from "./CoachingSection.module.css";
 
 interface Props {
@@ -24,7 +24,7 @@ export default function CoachingSection({ childId, childName }: Props) {
       return;
     }
 
-    api.post<CoachingData>("/api/ai/coaching", { child_id: childId })
+    postWithAuth<CoachingData>("/api/ai/coaching", { child_id: childId })
       .then((data) => {
         setCoaching(data.coaching);
         setLoading(false);

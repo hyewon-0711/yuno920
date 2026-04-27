@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { postWithAuth } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useChild } from "@/hooks/useChild";
 import AppHeader from "@/components/layout/AppHeader";
@@ -103,10 +104,7 @@ export default function NewRecordPage() {
 
       if (data?.id && content.trim().length > 10) {
         try {
-          await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/ai/auto-tag?record_id=${data.id}&content=${encodeURIComponent(content.trim())}`,
-            { method: "POST" }
-          );
+          await postWithAuth("/api/ai/auto-tag", { record_id: data.id, content: content.trim() });
         } catch {
           // auto-tagging is non-critical
         }

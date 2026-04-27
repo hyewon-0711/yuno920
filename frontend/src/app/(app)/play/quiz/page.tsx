@@ -6,7 +6,7 @@ import AppHeader from "@/components/layout/AppHeader";
 import CelebrationOverlay from "@/components/ui/CelebrationOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChild } from "@/hooks/useChild";
-import { api } from "@/lib/api";
+import { postWithAuth } from "@/lib/api";
 import styles from "./page.module.css";
 
 const CATEGORIES = [
@@ -77,7 +77,7 @@ export default function QuizPage() {
     setPhase("loading");
     setError("");
     try {
-      const res = await api.post<{ questions: QuizQuestion[] }>(
+      const res = await postWithAuth<{ questions: QuizQuestion[] }>(
         "/api/play/generate-quiz",
         { child_id: child.id, category: categoryId }
       );

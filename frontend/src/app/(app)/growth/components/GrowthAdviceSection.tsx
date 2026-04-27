@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { postWithAuth } from "@/lib/api";
 import { Button } from "@/components/ui";
 import type { HexagonScores } from "@/hooks/useHexagon";
 import styles from "./GrowthAdviceSection.module.css";
@@ -37,7 +37,7 @@ export default function GrowthAdviceSection({ childId, scores }: Props) {
     setAdvice("");
     setRecommendations([]);
     try {
-      const res = await api.post<{ advice: string; recommendations: string[] }>(
+      const res = await postWithAuth<{ advice: string; recommendations: string[] }>(
         "/api/ai/growth-advice",
         { child_id: childId, weak_areas: weakAreas.length > 0 ? weakAreas : ["전반적 개선"] }
       );

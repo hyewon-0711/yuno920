@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     supabase_url: str = ""
     supabase_service_role_key: str = ""
+    # Supabase 대시보드 → Project Settings → API → JWT Secret (auth.verify용)
+    supabase_jwt_secret: str = ""
     # 도우미·일정·기록 조회의 '오늘' 기준 (IANA, 예: Asia/Seoul)
     app_timezone: str = "Asia/Seoul"
 

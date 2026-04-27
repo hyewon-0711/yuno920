@@ -1,19 +1,31 @@
 from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
+
+from app.auth_deps import get_current_user_id
 from app.config import Settings, get_settings
 from app.dates import today_app
+from app.models.schemas import (
+    AutoTagRequest,
+    ChatAssistantRequest,
+    ChatAssistantResponse,
+    ChatRequest,
+    ChatResponse,
+    CoachingRequest,
+    CoachingResponse,
+    DailySummaryRequest,
+    DailySummaryResponse,
+    GrowthAdviceRequest,
+    GrowthAdviceResponse,
+    HexagonRequest,
+    HexagonResponse,
+    PersonalityRequest,
+    PersonalityResponse,
+    ReportRequest,
+    ReportResponse,
+)
 from app.services.openai_service import OpenAIService
 from app.services.supabase_service import SupabaseService
-from app.models.schemas import (
-    ChatRequest, ChatResponse,
-    ChatAssistantRequest, ChatAssistantResponse,
-    DailySummaryRequest, DailySummaryResponse,
-    ReportRequest, ReportResponse,
-    CoachingRequest, CoachingResponse,
-    PersonalityRequest, PersonalityResponse,
-    HexagonRequest, HexagonResponse,
-    GrowthAdviceRequest, GrowthAdviceResponse,
-)
 
 router = APIRouter()
 
@@ -24,16 +36,31 @@ def _get_child_age(birth_date_str: str) -> int:
     return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
 
 
+def _require_child_access(user_id: str, child_id: str) -> None:
+    db = SupabaseService()
+    if not db.user_has_child_access(user_id, child_id):
+        raise HTTPException(status_code=403, detail="이 아이에 대한 권한이 없습니다")
+
+
 @router.post("/chat", response_model=ChatResponse)
-async def chat(request: ChatRequest, settings: Settings = Depends(get_settings)):
+async def chat(
+    request: ChatRequest,
+    settings: Settings = Depends(get_settings),
+    _user_id: str = Depends(get_current_user_id),
+):
     service = OpenAIService(settings.openai_api_key)
     result = await service.chat(request.message)
     return ChatResponse(reply=result)
 
 
 @router.post("/chat-assistant", response_model=ChatAssistantResponse)
-async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Depends(get_settings)):
+async def chat_assistant(
+    request: ChatAssistantRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
     """아이 데이터(오늘 요일 주간 시간표, 일정, 기록, 독서) 기반 컨텍스트로 질문에 답변"""
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     child = db.get_child(request.child_id)
     if not child:
@@ -68,7 +95,12 @@ async def chat_assistant(request: ChatAssistantRequest, settings: Settings = Dep
 
 
 @router.post("/daily-summary", response_model=DailySummaryResponse)
-async def daily_summary(request: DailySummaryRequest, settings: Settings = Depends(get_settings)):
+async def daily_summary(
+    request: DailySummaryRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     child = db.get_child(request.child_id)
     if not child:
@@ -103,7 +135,12 @@ async def daily_summary(request: DailySummaryRequest, settings: Settings = Depen
 
 
 @router.post("/weekly-report", response_model=ReportResponse)
-async def weekly_report(request: ReportRequest, settings: Settings = Depends(get_settings)):
+async def weekly_report(
+    request: ReportRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     child = db.get_child(request.child_id)
     if not child:
@@ -131,7 +168,12 @@ async def weekly_report(request: ReportRequest, settings: Settings = Depends(get
 
 
 @router.post("/monthly-report", response_model=ReportResponse)
-async def monthly_report(request: ReportRequest, settings: Settings = Depends(get_settings)):
+async def monthly_report(
+    request: ReportRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     child = db.get_child(request.child_id)
     if not child:
@@ -159,7 +201,12 @@ async def monthly_report(request: ReportRequest, settings: Settings = Depends(ge
 
 
 @router.post("/coaching", response_model=CoachingResponse)
-async def coaching(request: CoachingRequest, settings: Settings = Depends(get_settings)):
+async def coaching(
+    request: CoachingRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     child = db.get_child(request.child_id)
     if not child:
@@ -186,7 +233,11 @@ async def coaching(request: CoachingRequest, settings: Settings = Depends(get_se
 
 
 @router.post("/personality", response_model=PersonalityResponse)
-async def personality(request: PersonalityRequest, settings: Settings = Depends(get_settings)):
+async def personality(
+    request: PersonalityRequest,
+    settings: Settings = Depends(get_settings),
+    _user_id: str = Depends(get_current_user_id),
+):
     ai = OpenAIService(settings.openai_api_key)
 
     birth_time_text = request.birth_time or "미입력"
@@ -197,6 +248,7 @@ JSON: {{"analysis": "...", "traits": {{"외향성": 7, "감성": 8, "호기심":
     response = await ai.chat(prompt)
 
     import json
+
     try:
         result = json.loads(response)
     except (json.JSONDecodeError, ValueError):
@@ -206,7 +258,12 @@ JSON: {{"analysis": "...", "traits": {{"외향성": 7, "감성": 8, "호기심":
 
 
 @router.post("/hexagon", response_model=HexagonResponse)
-async def hexagon(request: HexagonRequest, settings: Settings = Depends(get_settings)):
+async def hexagon(
+    request: HexagonRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     existing = db.get_hexagon_latest(request.child_id)
     if existing:
@@ -222,8 +279,13 @@ async def hexagon(request: HexagonRequest, settings: Settings = Depends(get_sett
 
 
 @router.post("/hexagon/calculate", response_model=HexagonResponse)
-async def hexagon_calculate(request: HexagonRequest, settings: Settings = Depends(get_settings)):
+async def hexagon_calculate(
+    request: HexagonRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
     """AI 기반 6각형 역량 자동 산출 및 저장"""
+    _require_child_access(user_id, request.child_id)
     db = SupabaseService()
     records = db.get_recent_records(request.child_id, days=90)
     reading = db.get_reading_logs_for_period(request.child_id, months=3)
@@ -248,7 +310,12 @@ async def hexagon_calculate(request: HexagonRequest, settings: Settings = Depend
 
 
 @router.post("/growth-advice", response_model=GrowthAdviceResponse)
-async def growth_advice(request: GrowthAdviceRequest, settings: Settings = Depends(get_settings)):
+async def growth_advice(
+    request: GrowthAdviceRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
     ai = OpenAIService(settings.openai_api_key)
     areas_text = ", ".join(request.weak_areas) if request.weak_areas else "전반적 개선"
 
@@ -258,22 +325,29 @@ async def growth_advice(request: GrowthAdviceRequest, settings: Settings = Depen
 
     response = await ai.chat(prompt)
     import re
+
     recs = re.findall(r"\d+\.\s*([^\n\d]+)", response)
     return GrowthAdviceResponse(advice=response, recommendations=recs[:5] if recs else [])
 
 
 @router.post("/auto-tag")
 async def auto_tag(
-    record_id: str,
-    content: str,
+    body: AutoTagRequest,
     settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
 ):
     """기록 작성 후 자동 태깅 (프론트에서 비동기 호출)"""
+    db = SupabaseService()
+    cid = db.get_record_child_id(body.record_id)
+    if not cid:
+        raise HTTPException(status_code=404, detail="기록을 찾을 수 없습니다")
+    if not db.user_has_child_access(user_id, cid):
+        raise HTTPException(status_code=403, detail="권한이 없습니다")
+
     ai = OpenAIService(settings.openai_api_key)
-    tags = await ai.auto_tag_record(content)
+    tags = await ai.auto_tag_record(body.content)
 
     if tags:
-        db = SupabaseService()
-        db.update_record_categories(record_id, tags)
+        db.update_record_categories(body.record_id, tags)
 
-    return {"record_id": record_id, "categories": tags}
+    return {"record_id": body.record_id, "categories": tags}

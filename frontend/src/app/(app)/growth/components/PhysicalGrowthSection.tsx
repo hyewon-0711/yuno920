@@ -14,7 +14,7 @@ import {
 import { Button, Input } from "@/components/ui";
 import Modal from "@/components/ui/Modal";
 import EmptyState from "@/components/ui/EmptyState";
-import { api } from "@/lib/api";
+import { postWithAuth } from "@/lib/api";
 import type { GrowthMetric } from "@/hooks/useGrowthMetrics";
 import styles from "./PhysicalGrowthSection.module.css";
 
@@ -116,7 +116,7 @@ export default function PhysicalGrowthSection({ childId, data, loading, onAdd }:
     setAiRecommendations([]);
     try {
       const ctx = physicalContextForAi(physicalRows);
-      const res = await api.post<{ advice: string; recommendations: string[] }>("/api/ai/growth-advice", {
+      const res = await postWithAuth<{ advice: string; recommendations: string[] }>("/api/ai/growth-advice", {
         child_id: childId,
         weak_areas: [ctx],
       });

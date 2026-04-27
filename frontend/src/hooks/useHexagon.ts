@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
-import { api } from "@/lib/api";
+import { postWithAuth } from "@/lib/api";
 
 export interface HexagonScores {
   learning: number;
@@ -60,7 +60,7 @@ export function useHexagon(childId: string | undefined) {
     if (!childId) return;
     setLoading(true);
     try {
-      const result = await api.post<HexagonScores>("/api/ai/hexagon/calculate", { child_id: childId });
+      const result = await postWithAuth<HexagonScores>("/api/ai/hexagon/calculate", { child_id: childId });
       setScores(result);
     } finally {
       setLoading(false);

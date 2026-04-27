@@ -1,6 +1,7 @@
 "use client";
 
 import AppHeader from "@/components/layout/AppHeader";
+import DailySummarySection from "./components/DailySummarySection";
 import ParentTrendsSection from "./components/ParentTrendsSection";
 import styles from "./page.module.css";
 
@@ -19,9 +20,8 @@ export default function InsightPage() {
 
         <section className={styles.section}>
           <h3 className="text-h3">✨ 하루 요약</h3>
-          <div className={styles.aiCard}>
-            <p>아직 오늘의 기록이 없어요.<br />기록을 남기면 AI가 하루를 요약해줍니다.</p>
-          </div>
+          <p className={styles.sectionLead}>오늘 날짜 기준으로 기록·독서를 바탕으로 AI가 요약합니다. (기록이 없으면 안내만 표시돼요)</p>
+          <DailySummarySection />
         </section>
 
         <section className={styles.section}>

@@ -17,6 +17,29 @@ class SupabaseService:
         res = self.client.table("children").select("*").eq("id", child_id).limit(1).execute()
         return res.data[0] if res.data else None
 
+    def user_has_child_access(self, user_id: str, child_id: str) -> bool:
+        """로그인 사용자가 자녀 데이터에 접근 가능한지(소유자 또는 family_members)."""
+        ch = self.get_child(child_id)
+        if not ch:
+            return False
+        if ch.get("user_id") == user_id:
+            return True
+        res = (
+            self.client.table("family_members")
+            .select("id")
+            .eq("user_id", user_id)
+            .eq("child_id", child_id)
+            .limit(1)
+            .execute()
+        )
+        return bool(res.data)
+
+    def get_record_child_id(self, record_id: str) -> str | None:
+        res = self.client.table("records").select("child_id").eq("id", record_id).limit(1).execute()
+        if not res.data:
+            return None
+        return res.data[0].get("child_id")
+
     def get_today_schedules(self, child_id: str) -> list[dict]:
         start_iso, end_iso = local_day_start_end_iso(today_app())
         res = (

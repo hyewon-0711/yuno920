@@ -14,6 +14,12 @@ class DateRangeRequest(BaseModel):
     end_date: date
 
 
+# ========== AI Auto tag ==========
+class AutoTagRequest(BaseModel):
+    record_id: str
+    content: str
+
+
 # ========== AI Chat ==========
 class ChatRequest(BaseModel):
     message: str
