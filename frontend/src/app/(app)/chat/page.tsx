@@ -40,7 +40,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     listRef.current?.scrollTo({ top: listRef.current.scrollHeight });
-  }, [messages]);
+  }, [messages, sending]);
 
   const handleSend = async () => {
     const text = input.trim();
@@ -111,8 +111,25 @@ export default function ChatPage() {
             ))
           )}
           {sending && (
-            <div className={styles.bubbleAssistant}>
-              <span className={styles.typing}>...</span>
+            <div
+              className={styles.bubbleAssistant}
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <div className={styles.typingBlock}>
+                <div className={styles.progressTrack} aria-hidden>
+                  <div className={styles.progressShimmer} />
+                </div>
+                <div className={styles.typingRow}>
+                  <span className={styles.typingText}>응답을 준비하고 있어요</span>
+                  <span className={styles.dotWrap} aria-hidden>
+                    <span className={styles.dot} />
+                    <span className={styles.dot} />
+                    <span className={styles.dot} />
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>
