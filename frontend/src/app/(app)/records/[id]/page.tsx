@@ -19,6 +19,7 @@ const moodEmoji: Record<string, string> = {
 
 interface RecordData {
   id: string;
+  title: string | null;
   content: string;
   mood: string | null;
   categories: string[];
@@ -34,6 +35,7 @@ export default function RecordDetailPage() {
 
   const [record, setRecord] = useState<RecordData | null>(null);
   const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [mood, setMood] = useState<Mood | undefined>(undefined);
   const [saving, setSaving] = useState(false);
@@ -47,6 +49,7 @@ export default function RecordDetailPage() {
       .single();
     if (data) {
       setRecord(data as RecordData);
+      setTitle(data.title || "");
       setContent(data.content);
       setMood(data.mood as Mood | undefined);
     }
@@ -58,6 +61,7 @@ export default function RecordDetailPage() {
   const handleSave = async () => {
     setSaving(true);
     const { error } = await supabase.from("records").update({
+      title: title.trim() || null,
       content: content.trim(),
       mood: mood || null,
     }).eq("id", recordId);
@@ -130,6 +134,21 @@ export default function RecordDetailPage() {
         )}
 
         {editing ? (
+          <div className={styles.section}>
+            <label className={styles.label}>제목</label>
+            <input
+              className={styles.input}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="기록 제목"
+              maxLength={200}
+            />
+          </div>
+        ) : record.title ? (
+          <p className={styles.title}>{record.title}</p>
+        ) : null}
+
+        {editing ? (
           <textarea
             className={styles.textarea}
             value={content}
@@ -165,7 +184,7 @@ export default function RecordDetailPage() {
         )}
 
         {editing && (
-          <Button variant="ghost" onClick={() => { setEditing(false); setContent(record.content); setMood(record.mood as Mood | undefined); }}>
+          <Button variant="ghost" onClick={() => { setEditing(false); setTitle(record.title || ""); setContent(record.content); setMood(record.mood as Mood | undefined); }}>
             취소
           </Button>
         )}

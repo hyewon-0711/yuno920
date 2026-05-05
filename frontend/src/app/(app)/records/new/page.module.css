@@ -50,6 +50,20 @@
   font-weight: 600;
 }
 
+.input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-default);
+  background: var(--bg-card);
+  font-size: 15px;
+  color: var(--text-primary);
+  transition: border-color var(--transition-normal);
+}
+
+.input:focus { border-color: var(--tab-record); outline: none; }
+.input::placeholder { color: var(--text-disabled); }
+
 .textarea {
   width: 100%;
   padding: var(--space-4);

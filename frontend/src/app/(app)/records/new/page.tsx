@@ -25,6 +25,7 @@ export default function NewRecordPage() {
   const { child } = useChild();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [mood, setMood] = useState<Mood | undefined>(undefined);
   const [selectedCats, setSelectedCats] = useState<string[]>([]);
@@ -93,6 +94,7 @@ export default function NewRecordPage() {
 
       const { data, error: insertErr } = await supabase.from("records").insert({
         child_id: child.id,
+        title: title.trim() || null,
         content: content.trim(),
         mood: mood || null,
         categories: selectedCats,
@@ -121,7 +123,7 @@ export default function NewRecordPage() {
   return (
     <>
       <AppHeader
-        title="새 기록"
+        title="기록 등록"
         backHref="/records"
         rightAction={
           <Button size="small" onClick={handleSave} loading={saving}>
@@ -157,13 +159,25 @@ export default function NewRecordPage() {
         </div>
 
         <div className={styles.section}>
+          <label className={styles.label}>제목</label>
+          <input
+            className={styles.input}
+            placeholder="예: GPT 요약 메모, 오늘 대화 핵심 정리"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={200}
+          />
+          <span className={styles.charCount}>{title.length}/200자</span>
+        </div>
+
+        <div className={styles.section}>
           <label className={styles.label}>기록 내용</label>
           <textarea
             className={styles.textarea}
-            placeholder="오늘 아이와의 일상을 기록해보세요..."
+            placeholder="GPT 결과나 나중에 기억할 내용을 길게 붙여넣어도 됩니다."
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows={6}
+            rows={12}
           />
           <span className={styles.charCount}>{content.length}자</span>
         </div>

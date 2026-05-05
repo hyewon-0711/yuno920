@@ -10,6 +10,7 @@ import styles from "./page.module.css";
 
 interface RecordItem {
   id: string;
+  title: string | null;
   content: string;
   mood: string | null;
   categories: string[];
@@ -103,6 +104,7 @@ export default function RecordsPage() {
                   <span className={styles.date}>{r.recorded_at}</span>
                   {r.mood && <span className={styles.mood}>{moodEmoji[r.mood] || ""}</span>}
                 </div>
+                {r.title && <p className={styles.title}>{r.title}</p>}
                 <p className={styles.content}>{r.content}</p>
                 {r.photos && r.photos.length > 0 && (
                   <div className={styles.photoCount}>📷 {r.photos.length}장</div>

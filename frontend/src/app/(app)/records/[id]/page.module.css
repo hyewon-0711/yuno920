@@ -33,6 +33,26 @@
   color: var(--text-secondary);
 }
 
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border-default);
+  background: var(--bg-card);
+  font-size: 15px;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.input:focus { border-color: var(--tab-record); outline: none; }
+
 .content {
   font-size: 16px;
   line-height: 1.8;

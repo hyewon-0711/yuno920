@@ -59,6 +59,13 @@
 
 .mood { font-size: 20px; }
 
+.title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-1);
+}
+
 .content {
   font-size: 15px;
   color: var(--text-primary);
