@@ -162,7 +162,7 @@ export default function NewRecordPage() {
           <label className={styles.label}>제목</label>
           <input
             className={styles.input}
-            placeholder="예: GPT 요약 메모, 오늘 대화 핵심 정리"
+            placeholder="나중에 기억할 내용 또는 오늘 있었던 일 기분등을 넣어주세요."
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={200}
