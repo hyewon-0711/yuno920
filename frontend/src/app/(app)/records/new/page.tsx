@@ -92,15 +92,40 @@ export default function NewRecordPage() {
         photoUrls = await uploadPhotos(child.id);
       }
 
-      const { data, error: insertErr } = await supabase.from("records").insert({
+      const basePayload = {
         child_id: child.id,
-        title: title.trim() || null,
         content: content.trim(),
         mood: mood || null,
         categories: selectedCats,
         photos: photoUrls,
         recorded_at: today,
-      }).select("id").single();
+      };
+
+      let data: { id: string } | null = null;
+      let insertErr: Error | null = null;
+
+      const insertWithTitle = await supabase
+        .from("records")
+        .insert({
+          ...basePayload,
+          title: title.trim() || null,
+        })
+        .select("id")
+        .single();
+
+      data = insertWithTitle.data as { id: string } | null;
+      insertErr = insertWithTitle.error;
+
+      // 운영 DB에 title 컬럼이 아직 반영되지 않은 경우를 위한 fallback
+      if (insertErr && insertErr.message.includes("title")) {
+        const fallbackInsert = await supabase
+          .from("records")
+          .insert(basePayload)
+          .select("id")
+          .single();
+        data = fallbackInsert.data as { id: string } | null;
+        insertErr = fallbackInsert.error;
+      }
 
       if (insertErr) throw insertErr;
 
