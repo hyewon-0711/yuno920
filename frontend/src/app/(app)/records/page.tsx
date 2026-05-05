@@ -66,7 +66,7 @@ export default function RecordsPage() {
             onClick={() => router.push("/records/new")}
             style={{ color: "var(--brand-primary)", fontWeight: 600, fontSize: 14 }}
           >
-            + 새 기록
+            + 등록
           </button>
         }
       />

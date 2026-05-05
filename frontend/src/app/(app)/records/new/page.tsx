@@ -87,6 +87,13 @@ export default function NewRecordPage() {
     setError("");
 
     try {
+      const { data: authData, error: authErr } = await supabase.auth.getUser();
+      if (authErr) throw authErr;
+      const userId = authData.user?.id;
+      if (!userId) {
+        throw new Error("로그인 정보가 없어요. 다시 로그인 후 시도해 주세요.");
+      }
+
       let photoUrls: string[] = [];
       if (photos.length > 0) {
         photoUrls = await uploadPhotos(child.id);
@@ -94,6 +101,7 @@ export default function NewRecordPage() {
 
       const basePayload = {
         child_id: child.id,
+        user_id: userId,
         content: content.trim(),
         mood: mood || null,
         categories: selectedCats,
@@ -102,7 +110,7 @@ export default function NewRecordPage() {
       };
 
       let data: { id: string } | null = null;
-      let insertErr: Error | null = null;
+      let insertErr: { message?: string } | null = null;
 
       const insertWithTitle = await supabase
         .from("records")
@@ -114,17 +122,17 @@ export default function NewRecordPage() {
         .single();
 
       data = insertWithTitle.data as { id: string } | null;
-      insertErr = insertWithTitle.error;
+      insertErr = insertWithTitle.error as { message?: string } | null;
 
-      // 운영 DB에 title 컬럼이 아직 반영되지 않은 경우를 위한 fallback
-      if (insertErr && insertErr.message.includes("title")) {
+      // 운영 DB 스키마 불일치 등으로 실패할 때 title 없이 fallback
+      if (insertErr) {
         const fallbackInsert = await supabase
           .from("records")
           .insert(basePayload)
           .select("id")
           .single();
         data = fallbackInsert.data as { id: string } | null;
-        insertErr = fallbackInsert.error;
+        insertErr = fallbackInsert.error as { message?: string } | null;
       }
 
       if (insertErr) throw insertErr;
@@ -139,7 +147,13 @@ export default function NewRecordPage() {
 
       router.push("/records");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "저장에 실패했습니다");
+      const message =
+        err instanceof Error
+          ? err.message
+          : (err as { message?: string; details?: string; hint?: string } | null)?.message ||
+            (err as { details?: string } | null)?.details ||
+            "저장에 실패했습니다";
+      setError(message);
     } finally {
       setSaving(false);
     }
