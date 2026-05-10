@@ -83,6 +83,31 @@
   margin-bottom: var(--space-6);
 }
 
+.themeSelector {
+  width: 100%;
+  max-width: var(--max-width);
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.themeBtn {
+  flex: 1;
+  border: 1px solid var(--border-default);
+  background: var(--bg-card);
+  border-radius: var(--radius-full);
+  padding: 8px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.themeBtnActive {
+  border-color: var(--tab-play);
+  color: var(--tab-play);
+  background: rgba(124, 58, 237, 0.08);
+  font-weight: 700;
+}
+
 .levelBadge {
   display: inline-flex;
   align-items: center;
@@ -144,6 +169,13 @@
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-6px); }
   75% { transform: translateX(6px); }
+}
+
+.storyText {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--space-4);
 }
 
 .problem {
