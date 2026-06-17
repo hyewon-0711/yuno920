@@ -34,17 +34,25 @@ export function useChild() {
     let cancelled = false;
 
     async function fetchChild() {
-      const { data, error } = await supabase
-        .from("children")
-        .select("*")
-        .eq("user_id", user!.id)
-        .limit(1);
+      try {
+        const { data, error } = await supabase
+          .from("children")
+          .select("*")
+          .eq("user_id", user!.id)
+          .limit(1);
 
-      if (cancelled) return;
-      hasFetchedForUser.current = true;
-      if (!error && data?.length) setChild(data[0] as Child);
-      else setChild(null);
-      setLoading(false);
+        if (cancelled) return;
+        hasFetchedForUser.current = true;
+        if (!error && data?.length) setChild(data[0] as Child);
+        else setChild(null);
+      } catch (err) {
+        console.error("fetch child failed:", err);
+        if (cancelled) return;
+        hasFetchedForUser.current = true;
+        setChild(null);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
 
     fetchChild();

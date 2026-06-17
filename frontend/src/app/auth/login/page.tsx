@@ -17,19 +17,35 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const { error: err } = await signInWithEmail(email, password);
-    if (err) {
-      setError("이메일 또는 비밀번호가 올바르지 않습니다.");
+    try {
+      const { error: err } = await signInWithEmail(email, password);
+      if (err) {
+        setError(err.message || "이메일 또는 비밀번호가 올바르지 않습니다.");
+        setLoading(false);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.error("email sign in failed:", err);
+      setError("로그인 서버에 연결하지 못했습니다. 잠시 후 다시 시도해주세요.");
       setLoading(false);
-    } else {
-      router.push("/dashboard");
     }
   };
 
   const handleSocial = async (provider: "google" | "kakao") => {
-    const { error: err } = await signInWithOAuth(provider);
-    if (err) {
-      setError("소셜 로그인에 실패했습니다. 다시 시도해주세요.");
+    setError("");
+    setLoading(true);
+
+    try {
+      const { error: err } = await signInWithOAuth(provider);
+      if (err) {
+        setError(err.message || "소셜 로그인에 실패했습니다. 다시 시도해주세요.");
+        setLoading(false);
+      }
+    } catch (err) {
+      console.error("social sign in failed:", err);
+      setError("로그인 서버에 연결하지 못했습니다. 잠시 후 다시 시도해주세요.");
+      setLoading(false);
     }
   };
 
