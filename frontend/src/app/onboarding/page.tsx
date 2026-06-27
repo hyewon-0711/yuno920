@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import InterestChipRow from "@/components/parent/InterestChipRow";
 import { supabase } from "@/lib/supabase";
 import {
@@ -203,7 +204,7 @@ export default function OnboardingPage() {
         <div className={styles.avatarWrapper}>
           <div className={styles.avatar}>
             {avatarPreview ? (
-              <img src={avatarPreview} alt="avatar" />
+              <Image src={avatarPreview} alt="아이 프로필 미리보기" width={120} height={120} unoptimized />
             ) : (
               "👶"
             )}

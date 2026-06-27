@@ -15,6 +15,90 @@ class OpenAIService:
         )
         return response.choices[0].message.content or ""
 
+    async def assess_activities(
+        self,
+        child_name: str,
+        child_age: int,
+        activities: list[dict],
+        recent_records: list[dict],
+        recent_reading: list[dict],
+        growth_metrics: list[dict],
+        schedules: list[dict],
+    ) -> dict:
+        """현재 활동 구성의 균형과 부담도를 JSON 계약으로 분석한다."""
+        import json
+
+        activity_text = "\n".join(
+            f"- {item.get('title', '')}: {item.get('area', '')}, {item.get('frequency', '')}"
+            for item in activities
+        )
+        context = {
+            "recent_record_count": len(recent_records),
+            "recent_reading_count": len(recent_reading),
+            "growth_metric_count": len(growth_metrics),
+            "today_schedule_count": len(schedules),
+        }
+        prompt = f"""{child_name}(만 {child_age}세)의 현재 활동 구성을 분석하세요.
+
+[활동]
+{activity_text}
+
+[참고 데이터]
+{json.dumps(context, ensure_ascii=False)}
+
+반드시 아래 JSON 객체만 반환하세요.
+{{
+  "overall_score": 0부터 100 사이 정수,
+  "summary": "부모가 이해하기 쉬운 2~4문장",
+  "load_level": "낮음|보통|높음",
+  "balance": {{"learning": 0, "physical": 0, "creative": 0, "social": 0, "emotion": 0, "habit": 0}},
+  "keep": [{{"activity": "활동명", "reason": "이유"}}],
+  "adjust": [{{"activity": "활동명", "reason": "이유"}}],
+  "add": [{{"area": "영역", "suggestion": "제안"}}],
+  "parent_actions": ["이번 주 실천 행동"],
+  "disclaimer": "이 분석은 기록된 활동을 바탕으로 한 참고용 AI 코칭입니다."
+}}
+
+규칙:
+- 의료·발달 진단처럼 단정하지 마세요.
+- 부모를 비난하거나 특정 활동을 금지하지 마세요.
+- 활동 수가 1개면 summary에 데이터가 더 쌓이면 정확도가 높아진다고 안내하세요.
+- parent_actions는 1~3개, 각 추천 배열은 최대 3개로 제한하세요.
+"""
+        response = await self.client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "당신은 균형 잡힌 육아 활동 코치입니다. JSON만 출력하세요."},
+                {"role": "user", "content": prompt},
+            ],
+            response_format={"type": "json_object"},
+        )
+        try:
+            raw = json.loads(response.choices[0].message.content or "{}")
+        except (json.JSONDecodeError, TypeError) as exc:
+            raise ValueError("AI 활동 분석 응답 형식이 올바르지 않습니다") from exc
+
+        def score(value, default=50) -> int:
+            try:
+                return min(100, max(0, int(value)))
+            except (TypeError, ValueError):
+                return default
+
+        balance = raw.get("balance") if isinstance(raw.get("balance"), dict) else {}
+        load_level = raw.get("load_level") if raw.get("load_level") in {"낮음", "보통", "높음"} else "보통"
+        summary = str(raw.get("summary") or "현재 활동 구성을 분석했습니다.").strip()
+        return {
+            "overall_score": score(raw.get("overall_score")),
+            "summary": summary[:1000],
+            "load_level": load_level,
+            "balance": {key: score(balance.get(key)) for key in ("learning", "physical", "creative", "social", "emotion", "habit")},
+            "keep": raw.get("keep", [])[:3] if isinstance(raw.get("keep"), list) else [],
+            "adjust": raw.get("adjust", [])[:3] if isinstance(raw.get("adjust"), list) else [],
+            "add": raw.get("add", [])[:3] if isinstance(raw.get("add"), list) else [],
+            "parent_actions": raw.get("parent_actions", [])[:3] if isinstance(raw.get("parent_actions"), list) else [],
+            "disclaimer": "이 분석은 기록된 활동을 바탕으로 한 참고용 AI 코칭입니다.",
+        }
+
     async def chat_with_context(
         self,
         child_name: str,

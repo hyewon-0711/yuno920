@@ -3,23 +3,23 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import {
+  Activity,
   Home,
   TrendingUp,
   PenSquare,
   Gamepad2,
-  MessageCircle,
   Sparkles,
   Settings,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
 const tabs = [
-  { href: "/dashboard", label: "Home", icon: Home, color: "var(--tab-home)" },
-  { href: "/growth", label: "Growth", icon: TrendingUp, color: "var(--tab-growth)" },
-  { href: "/records", label: "Record", icon: PenSquare, color: "var(--tab-record)" },
-  { href: "/play", label: "Play", icon: Gamepad2, color: "var(--tab-play)" },
-  { href: "/chat", label: "도우미", icon: MessageCircle, color: "var(--tab-insight)" },
-  { href: "/insight", label: "Insight", icon: Sparkles, color: "var(--tab-insight)" },
+  { href: "/dashboard", label: "홈", icon: Home, color: "var(--tab-home)" },
+  { href: "/activities", label: "활동", icon: Activity, color: "var(--brand-primary)" },
+  { href: "/growth", label: "성장", icon: TrendingUp, color: "var(--tab-growth)" },
+  { href: "/records", label: "기록", icon: PenSquare, color: "var(--tab-record)" },
+  { href: "/play", label: "놀이", icon: Gamepad2, color: "var(--tab-play)" },
+  { href: "/insight", label: "인사이트", icon: Sparkles, color: "var(--tab-insight)" },
 ];
 
 export default function Sidebar() {

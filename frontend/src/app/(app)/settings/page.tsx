@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 import { getSupabaseErrorMessage, hintForMissingInterestColumn } from "@/lib/supabaseErrors";
 import { normalizeInterestIds, type ParentInterestId } from "@/lib/parentInterests";
 import styles from "./page.module.css";
+import SettingsDataSections from "./SettingsDataSections";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -128,7 +129,7 @@ export default function SettingsPage() {
           )}
         </section>
 
-        <div className={styles.placeholder}>알림 · 가족 관리 등은 추후 연결됩니다</div>
+        <SettingsDataSections />
         <Button variant="ghost" fullWidth onClick={handleLogout}>
           로그아웃
         </Button>

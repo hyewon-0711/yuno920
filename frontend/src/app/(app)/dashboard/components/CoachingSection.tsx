@@ -16,13 +16,10 @@ interface CoachingData {
 
 export default function CoachingSection({ childId, childName }: Props) {
   const [coaching, setCoaching] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(childId));
 
   useEffect(() => {
-    if (!childId) {
-      setLoading(false);
-      return;
-    }
+    if (!childId) return;
 
     postWithAuth<CoachingData>("/api/ai/coaching", { child_id: childId })
       .then((data) => {

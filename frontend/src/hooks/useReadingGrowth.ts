@@ -44,7 +44,8 @@ export function useReadingGrowth(childId: string | undefined, months = 6) {
   }, [childId, months]);
 
   useEffect(() => {
-    fetch();
+    const timer = window.setTimeout(() => void fetch(), 0);
+    return () => window.clearTimeout(timer);
   }, [fetch]);
 
   return { data, loading, refetch: fetch };

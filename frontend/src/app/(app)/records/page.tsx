@@ -49,7 +49,10 @@ export default function RecordsPage() {
     setLoading(false);
   }, [child]);
 
-  useEffect(() => { fetchRecords(); }, [fetchRecords]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => void fetchRecords(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchRecords]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("이 기록을 삭제할까요?")) return;

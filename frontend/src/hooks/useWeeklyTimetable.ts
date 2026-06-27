@@ -62,7 +62,8 @@ export function useWeeklyTimetable(childId: string | undefined) {
   );
 
   useEffect(() => {
-    void fetch();
+    const timer = window.setTimeout(() => void fetch(), 0);
+    return () => window.clearTimeout(timer);
   }, [fetch]);
 
   const addEntry = async (input: {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import AppHeader from "@/components/layout/AppHeader";
 import { Button } from "@/components/ui";
@@ -56,7 +57,10 @@ export default function RecordDetailPage() {
     setLoading(false);
   }, [recordId]);
 
-  useEffect(() => { fetchRecord(); }, [fetchRecord]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => void fetchRecord(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchRecord]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -170,7 +174,7 @@ export default function RecordDetailPage() {
         {record.photos && record.photos.length > 0 && (
           <div className={styles.photoGrid}>
             {record.photos.map((url, i) => (
-              <img key={i} src={url} alt="" className={styles.photo} />
+              <Image key={i} src={url} alt="" width={320} height={240} unoptimized className={styles.photo} />
             ))}
           </div>
         )}

@@ -6,6 +6,8 @@ from app.auth_deps import get_current_user_id
 from app.config import Settings, get_settings
 from app.dates import today_app
 from app.models.schemas import (
+    ActivityAssessmentRequest,
+    ActivityAssessmentResponse,
     AutoTagRequest,
     ChatAssistantRequest,
     ChatAssistantResponse,
@@ -40,6 +42,45 @@ def _require_child_access(user_id: str, child_id: str) -> None:
     db = SupabaseService()
     if not db.user_has_child_access(user_id, child_id):
         raise HTTPException(status_code=403, detail="이 아이에 대한 권한이 없습니다")
+
+
+@router.post("/activity-assessment", response_model=ActivityAssessmentResponse)
+async def activity_assessment(
+    request: ActivityAssessmentRequest,
+    settings: Settings = Depends(get_settings),
+    user_id: str = Depends(get_current_user_id),
+):
+    _require_child_access(user_id, request.child_id)
+    db = SupabaseService()
+    child = db.get_child(request.child_id)
+    if not child:
+        raise HTTPException(status_code=404, detail="아이 프로필을 찾을 수 없습니다")
+
+    activities = db.get_active_activities(request.child_id)
+    if not activities:
+        raise HTTPException(status_code=400, detail="분석할 활동을 먼저 추가해주세요")
+
+    ai = OpenAIService(settings.openai_api_key)
+    try:
+        result = await ai.assess_activities(
+            child_name=child["name"],
+            child_age=_get_child_age(child["birth_date"]),
+            activities=activities,
+            recent_records=db.get_recent_records(request.child_id, days=30),
+            recent_reading=db.get_recent_reading_logs(request.child_id, days=30),
+            growth_metrics=db.get_growth_metrics(request.child_id, months=3),
+            schedules=db.get_today_schedules(request.child_id),
+        )
+        saved = db.save_activity_assessment(request.child_id, activities, result)
+    except ValueError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+    return ActivityAssessmentResponse(
+        id=saved["id"],
+        summary=result["summary"],
+        score=result["overall_score"],
+        result=result,
+    )
 
 
 @router.post("/chat", response_model=ChatResponse)

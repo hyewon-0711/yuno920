@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Yuno920 Activity Analysis UI Plan</title>
+  <style>
+    :root {
+      --brand: #f97316;
+      --brand-dark: #ea580c;
+      --ink: #111827;
+      --muted: #6b7280;
+      --soft: #f8fafc;
+      --line: #e5e7eb;
+      --green: #16a34a;
+      --blue: #2563eb;
+      --violet: #7c3aed;
+      --red: #dc2626;
+      --amber: #d97706;
+      --card: #ffffff;
+      --radius: 8px;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #eef2f7;
+      color: var(--ink);
+    }
+
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .brief {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 24px;
+      margin-bottom: 28px;
+      align-items: end;
+    }
+
+    .brief h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .brief p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .legend {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+
+    .legend h2 {
+      margin: 0 0 12px;
+      font-size: 15px;
+    }
+
+    .legend-list {
+      display: grid;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      vertical-align: 1px;
+    }
+
+    .canvas {
+      display: grid;
+      grid-template-columns: 420px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+    }
+
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+      overflow: hidden;
+      position: sticky;
+      top: 24px;
+    }
+
+    .phone-status {
+      height: 28px;
+      background: #ffffff;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .app-header {
+      height: 56px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    .app-header h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .phone-content {
+      height: 704px;
+      overflow: hidden;
+      padding: 18px 18px 84px;
+    }
+
+    .score-hero {
+      background: linear-gradient(135deg, #fff7ed 0%, #ffffff 54%, #eef6ff 100%);
+      border: 1px solid #fed7aa;
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .score-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .score-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 5px;
+    }
+
+    .score-title {
+      font-size: 20px;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .score-ring {
+      width: 78px;
+      height: 78px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, white 0 58%, transparent 59%),
+        conic-gradient(var(--green) 0 82%, #e5e7eb 82% 100%);
+      flex: 0 0 auto;
+    }
+
+    .score-ring strong {
+      font-size: 22px;
+      color: var(--green);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #374151;
+      white-space: nowrap;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 18px 0 10px;
+    }
+
+    .section-head h3 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .text-btn {
+      border: 0;
+      background: transparent;
+      color: var(--brand-dark);
+      font-weight: 700;
+      font-size: 13px;
+      padding: 4px;
+    }
+
+    .activity-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .activity-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #ffffff;
+      padding: 14px;
+    }
+
+    .activity-main {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .activity-name {
+      font-weight: 800;
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .activity-meta {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .badge {
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.good { background: #dcfce7; color: #166534; }
+    .badge.watch { background: #fef3c7; color: #92400e; }
+    .badge.adjust { background: #fee2e2; color: #991b1b; }
+
+    .keywords {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .keyword {
+      background: #f3f4f6;
+      color: #4b5563;
+      border-radius: 999px;
+      padding: 4px 7px;
+      font-size: 11px;
+    }
+
+    .ai-panel {
+      background: #111827;
+      color: #ffffff;
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .ai-panel h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .ai-panel p {
+      margin: 0 0 12px;
+      color: #d1d5db;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .primary-btn {
+      width: 100%;
+      height: 46px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--brand);
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 74px;
+      background: #ffffff;
+      border-top: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      padding-top: 8px;
+    }
+
+    .nav-item {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .nav-item .nav-icon {
+      display: block;
+      margin: 0 auto 4px;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+    }
+
+    .nav-item.active {
+      color: var(--brand-dark);
+      font-weight: 800;
+    }
+
+    .nav-item.active .nav-icon {
+      background: #ffedd5;
+      border-color: #fdba74;
+    }
+
+    .desktop {
+      display: grid;
+      gap: 24px;
+    }
+
+    .board {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .board-title {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .board-title h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .board-title p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .wire-grid {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr) 280px;
+      min-height: 480px;
+    }
+
+    .side-menu {
+      border-right: 1px solid var(--line);
+      padding: 18px;
+      background: #fbfdff;
+    }
+
+    .menu-item {
+      height: 42px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      border-radius: 8px;
+      color: #374151;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .menu-mark {
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      background: #e5e7eb;
+    }
+
+    .menu-item.active {
+      background: #fff7ed;
+      color: var(--brand-dark);
+      font-weight: 800;
+    }
+
+    .menu-item.active .menu-mark {
+      background: var(--brand);
+    }
+
+    .main-wire {
+      padding: 22px;
+      background: #ffffff;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      gap: 16px;
+    }
+
+    .toolbar h3 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .secondary-btn {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #ffffff;
+      color: #374151;
+      font-weight: 700;
+      padding: 0 12px;
+    }
+
+    .compact-primary {
+      height: 38px;
+      border-radius: 8px;
+      border: 0;
+      background: var(--brand);
+      color: #ffffff;
+      font-weight: 800;
+      padding: 0 14px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: #ffffff;
+    }
+
+    .metric span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .metric strong {
+      font-size: 22px;
+    }
+
+    .table {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .table-row {
+      display: grid;
+      grid-template-columns: minmax(150px, 1.3fr) 100px 120px 120px 100px;
+      min-height: 54px;
+      align-items: center;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+
+    .table-row:last-child { border-bottom: 0; }
+    .table-row.header {
+      background: #f9fafb;
+      color: var(--muted);
+      font-weight: 800;
+      min-height: 42px;
+    }
+
+    .table-row > div {
+      padding: 10px 12px;
+    }
+
+    .right-wire {
+      border-left: 1px solid var(--line);
+      padding: 18px;
+      background: #fbfdff;
+    }
+
+    .balance {
+      display: grid;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) 34px;
+      gap: 8px;
+      align-items: center;
+      font-size: 12px;
+      color: #374151;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    .result-card {
+      border: 1px solid var(--line);
+      background: #ffffff;
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-top: 16px;
+    }
+
+    .result-card h4 {
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+
+    .result-card p,
+    .result-card li {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .result-card p { margin: 0; }
+    .result-card ul { margin: 8px 0 0; padding-left: 18px; }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 20px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    .flow-step {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 14px;
+      background: #fbfdff;
+      min-height: 130px;
+    }
+
+    .flow-step strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .flow-step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .modal-plan {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      padding: 20px;
+    }
+
+    .form-card,
+    .analysis-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      background: #ffffff;
+    }
+
+    .form-field {
+      margin-bottom: 12px;
+    }
+
+    .form-field label {
+      display: block;
+      font-size: 12px;
+      color: #374151;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .input-box {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      color: #9ca3af;
+      font-size: 13px;
+      background: #f9fafb;
+    }
+
+    .disclaimer {
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1e40af;
+      border-radius: var(--radius);
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      margin-top: 14px;
+    }
+
+    @media (max-width: 1100px) {
+      .canvas {
+        grid-template-columns: 1fr;
+      }
+
+      .phone {
+        position: static;
+        margin: 0 auto;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 18px;
+      }
+
+      .brief,
+      .wire-grid,
+      .modal-plan,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .table-row {
+        grid-template-columns: 1fr;
+      }
+
+      .table-row.header {
+        display: none;
+      }
+
+      .phone {
+        width: min(390px, calc(100vw - 80px));
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="brief">
+      <div>
+        <h1>활동 분석 메뉴 UI/UX 기획</h1>
+        <p>
+          윤호가 현재 하고 있는 활동을 활동명·영역·빈도로 관리하고, AI가 활동 균형과 부담도를 분석해
+          유지·조정·추가 추천을 제공하는 신규 메뉴 화면안입니다.
+        </p>
+      </div>
+      <aside class="legend">
+        <h2>기획 원칙</h2>
+        <div class="legend-list">
+          <div><span class="dot" style="background: var(--brand)"></span>부모가 빠르게 입력하고 판단을 받는 흐름</div>
+          <div><span class="dot" style="background: var(--green)"></span>진단이 아니라 참고용 코칭 톤 유지</div>
+          <div><span class="dot" style="background: var(--blue)"></span>활동명·영역·빈도만 입력하는 MVP</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="canvas">
+      <div class="phone" aria-label="모바일 활동 분석 화면">
+        <div class="phone-status"></div>
+        <header class="app-header">
+          <h2>활동</h2>
+          <button class="icon-btn" aria-label="활동 추가">+</button>
+        </header>
+        <div class="phone-content">
+          <section class="score-hero">
+            <div class="score-top">
+      <div>
+        <div class="score-label">AI 활동 적절성</div>
+        <div class="score-title">현재 구성은 좋은 편이에요</div>
+      </div>
+              <div class="score-ring"><strong>82</strong></div>
+            </div>
+            <div class="chips">
+              <span class="chip">부담도 보통</span>
+              <span class="chip">신체 충분</span>
+              <span class="chip">창의 보완</span>
+            </div>
+          </section>
+
+          <div class="section-head">
+            <h3>진행 중인 활동</h3>
+            <button class="text-btn">전체 보기</button>
+          </div>
+
+          <div class="activity-list">
+            <article class="activity-card">
+              <div class="activity-main">
+                <div>
+                  <div class="activity-name">태권도</div>
+                  <div class="activity-meta">주 2회 · 60분 · 신체</div>
+                </div>
+                <span class="badge good">유지</span>
+              </div>
+      <div class="keywords">
+        <span class="keyword">신체</span>
+        <span class="keyword">주 2회</span>
+      </div>
+            </article>
+
+            <article class="activity-card">
+              <div class="activity-main">
+                <div>
+                  <div class="activity-name">수학 학원</div>
+                  <div class="activity-meta">주 2회 · 90분 · 학습</div>
+                </div>
+                <span class="badge watch">관찰</span>
+              </div>
+      <div class="keywords">
+        <span class="keyword">학습</span>
+        <span class="keyword">주 2회</span>
+      </div>
+            </article>
+
+            <article class="activity-card">
+              <div class="activity-main">
+                <div>
+                  <div class="activity-name">독서</div>
+                  <div class="activity-meta">매일 · 20분 · 언어</div>
+                </div>
+                <span class="badge good">유지</span>
+              </div>
+      <div class="keywords">
+        <span class="keyword">독서</span>
+        <span class="keyword">매일</span>
+      </div>
+            </article>
+          </div>
+
+          <section class="ai-panel">
+            <h3>최근 AI 분석</h3>
+            <p>신체 활동은 충분하지만 창의·예술 활동이 조금 부족합니다. 주 1회 짧은 만들기나 음악 활동을 추가해도 좋아요.</p>
+            <button class="primary-btn">AI 분석 다시 하기</button>
+          </section>
+        </div>
+        <nav class="bottom-nav" aria-label="하단 메뉴">
+          <div class="nav-item"><span class="nav-icon"></span>홈</div>
+          <div class="nav-item active"><span class="nav-icon"></span>활동</div>
+          <div class="nav-item"><span class="nav-icon"></span>성장</div>
+          <div class="nav-item"><span class="nav-icon"></span>기록</div>
+          <div class="nav-item"><span class="nav-icon"></span>인사이트</div>
+        </nav>
+      </div>
+
+      <div class="desktop">
+        <section class="board">
+          <div class="board-title">
+            <div>
+              <h2>데스크톱/태블릿 레이아웃</h2>
+              <p>활동 관리, 균형 점수, AI 분석 결과를 한 화면에서 비교합니다.</p>
+            </div>
+            <button class="compact-primary">활동 추가</button>
+          </div>
+
+          <div class="wire-grid">
+            <aside class="side-menu">
+              <div class="menu-item"><span class="menu-mark"></span>홈</div>
+              <div class="menu-item active"><span class="menu-mark"></span>활동 분석</div>
+              <div class="menu-item"><span class="menu-mark"></span>성장</div>
+              <div class="menu-item"><span class="menu-mark"></span>기록</div>
+              <div class="menu-item"><span class="menu-mark"></span>놀이</div>
+              <div class="menu-item"><span class="menu-mark"></span>인사이트</div>
+            </aside>
+
+            <section class="main-wire">
+              <div class="toolbar">
+                <h3>윤호의 활동</h3>
+                <div class="toolbar-actions">
+                  <button class="secondary-btn">주간 시간표에서 가져오기</button>
+                  <button class="compact-primary">AI 분석</button>
+                </div>
+              </div>
+
+              <div class="metrics">
+                <div class="metric"><span>활동 수</span><strong>5</strong></div>
+                <div class="metric"><span>주간 시간</span><strong>8.5h</strong></div>
+                <div class="metric"><span>부담도</span><strong>보통</strong></div>
+                <div class="metric"><span>균형 점수</span><strong>82</strong></div>
+              </div>
+
+              <div class="table">
+                <div class="table-row header">
+                  <div>활동</div><div>영역</div><div>빈도</div><div>AI 판단</div><div>관리</div>
+                </div>
+                <div class="table-row">
+                <div><strong>태권도</strong><br><span class="activity-meta">신체 · 주 2회</span></div>
+                  <div>신체</div><div>주 2회</div><div><span class="badge good">유지 추천</span></div><div>수정</div>
+                </div>
+                <div class="table-row">
+                <div><strong>수학 학원</strong><br><span class="activity-meta">학습 · 주 2회</span></div>
+                  <div>학습</div><div>주 2회</div><div><span class="badge watch">피로 관찰</span></div><div>수정</div>
+                </div>
+                <div class="table-row">
+                <div><strong>피아노</strong><br><span class="activity-meta">예술 · 주 1회</span></div>
+                  <div>예술</div><div>주 1회</div><div><span class="badge good">유지 추천</span></div><div>수정</div>
+                </div>
+              </div>
+            </section>
+
+            <aside class="right-wire">
+              <h3 style="margin:0 0 4px;font-size:16px;">활동 균형</h3>
+              <p style="margin:0;color:var(--muted);font-size:13px;line-height:1.5;">학습과 신체는 충분하고 창의 영역은 보완 여지가 있습니다.</p>
+              <div class="balance">
+                <div class="bar-row"><span>학습</span><div class="bar"><div class="bar-fill" style="width:74%;background:var(--blue)"></div></div><span>74</span></div>
+                <div class="bar-row"><span>신체</span><div class="bar"><div class="bar-fill" style="width:88%;background:var(--green)"></div></div><span>88</span></div>
+                <div class="bar-row"><span>정서</span><div class="bar"><div class="bar-fill" style="width:58%;background:var(--violet)"></div></div><span>58</span></div>
+                <div class="bar-row"><span>창의</span><div class="bar"><div class="bar-fill" style="width:42%;background:var(--amber)"></div></div><span>42</span></div>
+                <div class="bar-row"><span>사회</span><div class="bar"><div class="bar-fill" style="width:66%;background:var(--brand)"></div></div><span>66</span></div>
+              </div>
+
+              <div class="result-card">
+                <h4>AI 코칭 요약</h4>
+                <p>수학 학원 뒤에는 회복 시간이 필요합니다. 주말에 창의 활동을 짧게 추가하면 전체 균형이 좋아집니다.</p>
+              </div>
+
+              <div class="result-card">
+                <h4>다음 액션</h4>
+                <ul>
+                  <li>수학 학원 후 자유 놀이 30분 확보</li>
+                  <li>주 1회 만들기 또는 음악 활동 추가</li>
+                  <li>2주 뒤 피로도와 반응 재평가</li>
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="flow" aria-label="사용자 흐름">
+          <div class="flow-step">
+            <strong>1. 활동 등록</strong>
+            <p>활동명, 영역, 빈도만 입력합니다. 세부 키워드는 AI 분석에서 추론합니다.</p>
+          </div>
+          <div class="flow-step">
+            <strong>2. 데이터 연결</strong>
+            <p>주간 시간표, 일정, 기록, 독서, 성장 점수를 함께 참조합니다.</p>
+          </div>
+          <div class="flow-step">
+            <strong>3. AI 분석</strong>
+            <p>균형, 부담도, 나이 적합성, 유지·조정·추가 추천을 생성합니다.</p>
+          </div>
+          <div class="flow-step">
+            <strong>4. 후속 관리</strong>
+            <p>분석 결과를 저장하고 2주 뒤 다시 평가할 수 있게 합니다.</p>
+          </div>
+        </section>
+
+        <section class="board">
+          <div class="board-title">
+            <div>
+              <h2>입력 모달과 분석 결과 화면</h2>
+              <p>MVP에서는 모달 입력 후 결과 패널로 이어지는 단순 흐름을 권장합니다.</p>
+            </div>
+          </div>
+          <div class="modal-plan">
+            <div class="form-card">
+              <h3 style="margin:0 0 14px;font-size:17px;">활동 추가</h3>
+              <div class="form-field"><label>활동명</label><div class="input-box">예: 태권도</div></div>
+              <div class="form-field"><label>영역</label><div class="input-box">신체 / 학습 / 예술 / 사회성 / 정서 / 독서</div></div>
+              <div class="form-field"><label>빈도</label><div class="input-box">매일 / 주 1회 / 주 2회 / 주 3회 / 비정기</div></div>
+              <button class="primary-btn">저장</button>
+            </div>
+
+            <div class="analysis-card">
+              <h3 style="margin:0 0 14px;font-size:17px;">AI 분석 결과</h3>
+              <div class="metric" style="margin-bottom:12px;"><span>전체 적절성</span><strong>82점</strong></div>
+              <div class="result-card" style="margin-top:0;">
+                <h4>유지 추천</h4>
+                <p>태권도와 독서는 현재 윤호의 활동 균형에 긍정적입니다.</p>
+              </div>
+              <div class="result-card">
+                <h4>조정 추천</h4>
+                <p>학습 활동은 유지하되 회복 시간을 함께 확보하는 편이 좋습니다.</p>
+              </div>
+              <div class="disclaimer">
+                이 분석은 의학적·교육적 진단이 아니라, 기록된 활동을 바탕으로 한 참고용 AI 코칭입니다.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

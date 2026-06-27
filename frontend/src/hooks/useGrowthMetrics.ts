@@ -57,7 +57,8 @@ export function useGrowthMetrics(childId: string | undefined) {
   }, [childId]);
 
   useEffect(() => {
-    fetch();
+    const timer = window.setTimeout(() => void fetch(), 0);
+    return () => window.clearTimeout(timer);
   }, [fetch]);
 
   const addPhysical = async (height: number, weight: number, recordedAt: string, memo?: string) => {

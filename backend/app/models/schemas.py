@@ -110,6 +110,18 @@ class GrowthAdviceResponse(BaseModel):
     recommendations: list[str] = []
 
 
+# ========== AI Activity Assessment ==========
+class ActivityAssessmentRequest(BaseModel):
+    child_id: str
+
+
+class ActivityAssessmentResponse(BaseModel):
+    id: str
+    summary: str
+    score: int = Field(ge=0, le=100)
+    result: dict
+
+
 # ========== External Weather ==========
 class WeatherResponse(BaseModel):
     temperature: float

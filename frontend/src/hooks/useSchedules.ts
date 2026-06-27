@@ -48,7 +48,8 @@ export function useSchedules(childId: string | undefined) {
   }, [childId]);
 
   useEffect(() => {
-    fetchSchedules();
+    const timer = window.setTimeout(() => void fetchSchedules(), 0);
+    return () => window.clearTimeout(timer);
   }, [fetchSchedules]);
 
   const addSchedule = async (schedule: { title: string; start_time: string; repeat_type: string; location?: string; end_time?: string }) => {

@@ -61,7 +61,7 @@ function formatTime(sec: number): string {
 export default function MemoryGamePage() {
   const [currentLevel, setCurrentLevel] = useState(1);
   const [phase, setPhase] = useState<GamePhase>("preview");
-  const [cards, setCards] = useState<Card[]>([]);
+  const [cards, setCards] = useState<Card[]>(() => createCards(LEVELS[0].pairs));
   const [flipped, setFlipped] = useState<Set<number>>(new Set());
   const [attempts, setAttempts] = useState(0);
   const [timeLeft, setTimeLeft] = useState(120);
@@ -69,17 +69,6 @@ export default function MemoryGamePage() {
   const [showCelebration, setShowCelebration] = useState(false);
 
   const config = LEVELS.find((l) => l.level === currentLevel) ?? LEVELS[LEVELS.length - 1];
-
-  const cardsForLevel = useMemo(() => createCards(config.pairs), [currentLevel, config.pairs]);
-
-  useEffect(() => {
-    setCards(cardsForLevel);
-    setFlipped(new Set());
-    setAttempts(0);
-    setTimeLeft(config.timeLimit);
-    setPhase("preview");
-    setShakeCards(new Set());
-  }, [currentLevel, config.timeLimit, cardsForLevel]);
 
   useEffect(() => {
     if (phase !== "preview") return;
@@ -121,12 +110,17 @@ export default function MemoryGamePage() {
         const cardB = cards.find((c) => c.id === bId)!;
 
         if (cardA.emoji === cardB.emoji) {
+          const willComplete = cards.filter((item) => item.matched).length + 2 >= config.pairs * 2;
           setCards((prev) =>
             prev.map((c) =>
               c.id === aId || c.id === bId ? { ...c, matched: true } : c
             )
           );
           setFlipped(new Set());
+          if (willComplete) {
+            setPhase("finished");
+            setShowCelebration(true);
+          }
         } else {
           setShakeCards(new Set([aId, bId]));
           setTimeout(() => {
@@ -136,25 +130,22 @@ export default function MemoryGamePage() {
         }
       }
     },
-    [phase, cards, flipped]
+    [phase, cards, flipped, config.pairs]
   );
 
   const matchedCount = cards.filter((c) => c.matched).length / 2;
   const allMatched = matchedCount >= config.pairs;
 
-  useEffect(() => {
-    if (phase === "playing" && allMatched) {
-      setPhase("finished");
-      setShowCelebration(true);
-    }
-  }, [phase, allMatched, config.pairs]);
-
   const handleGoNextLevel = () => {
-    if (currentLevel < LEVELS.length) {
-      setCurrentLevel((l) => l + 1);
-    } else {
-      setCurrentLevel(1);
-    }
+    const nextLevel = currentLevel < LEVELS.length ? currentLevel + 1 : 1;
+    const nextConfig = LEVELS.find((level) => level.level === nextLevel) ?? LEVELS[0];
+    setCurrentLevel(nextLevel);
+    setCards(createCards(nextConfig.pairs));
+    setFlipped(new Set());
+    setAttempts(0);
+    setTimeLeft(nextConfig.timeLimit);
+    setPhase("preview");
+    setShakeCards(new Set());
   };
 
   const score = useMemo(() => {

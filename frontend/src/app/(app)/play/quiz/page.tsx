@@ -91,7 +91,7 @@ export default function QuizPage() {
         setError("퀴즈를 불러오지 못했어요. 다시 시도해주세요.");
         setPhase("category");
       }
-    } catch (err) {
+    } catch {
       setError("퀴즈를 불러오지 못했어요. 잠시 후 다시 시도해주세요.");
       setPhase("category");
     }

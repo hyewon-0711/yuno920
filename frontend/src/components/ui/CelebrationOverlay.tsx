@@ -35,21 +35,15 @@ export default function CelebrationOverlay({
   duration = 2500,
   message = "🎉 레벨 업! 🎉",
 }: CelebrationOverlayProps) {
-  const [visible, setVisible] = useState(false);
   const [particles] = useState(createParticles);
 
   useEffect(() => {
-    if (show) {
-      setVisible(true);
-      const t = setTimeout(() => {
-        setVisible(false);
-        onComplete?.();
-      }, duration);
-      return () => clearTimeout(t);
-    }
+    if (!show) return;
+    const t = setTimeout(() => onComplete?.(), duration);
+    return () => clearTimeout(t);
   }, [show, duration, onComplete]);
 
-  if (!show && !visible) return null;
+  if (!show) return null;
 
   return (
     <div className={styles.overlay}>

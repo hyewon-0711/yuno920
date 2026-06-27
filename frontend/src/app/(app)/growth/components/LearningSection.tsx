@@ -20,6 +20,11 @@ function levelLabel(score: number): string {
   return "보완 필요";
 }
 
+function formatScore(score: number | null | undefined): string {
+  if (score == null || Number.isNaN(score)) return "-";
+  return Number.isInteger(score) ? `${score}` : score.toFixed(1);
+}
+
 interface Props {
   data: GrowthMetric[];
   loading: boolean;
@@ -53,7 +58,7 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
 
   const handleSave = async () => {
     setFormError("");
-    const s = parseInt(srScore, 10);
+    const s = parseFloat(srScore);
     if (isNaN(s) || s < 0 || s > 100) {
       setFormError("학습 점수는 0~100 범위로 입력해주세요");
       return;
@@ -94,7 +99,7 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
           {latest && (
             <div className={styles.summaryBlock}>
               <div className={styles.summary}>
-                <span>최근: {latest.sr_score}점</span>
+                <span>최근: {formatScore(latest.sr_score)}점</span>
                 <span className={styles.grade}>{levelLabel(Number(latest.sr_score))}</span>
               </div>
               {latestMemo && <p className={styles.latestMemo}>{latestMemo}</p>}
@@ -123,7 +128,7 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
                           }}
                         >
                           <div style={{ fontWeight: 600, marginBottom: 4 }}>{d.date}</div>
-                          <div>{d.score}점</div>
+                          <div>{formatScore(d.score)}점</div>
                           {d.memo ? (
                             <div style={{ marginTop: 6, color: "var(--text-secondary)", whiteSpace: "pre-wrap" }}>{d.memo}</div>
                           ) : null}
@@ -148,7 +153,7 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
                       <div className={styles.entryMeta}>
                         <span className={styles.entryDate}>{r.recorded_at}</span>
                         <span>
-                          {r.sr_score}점 · {levelLabel(Number(r.sr_score))}
+                          {formatScore(r.sr_score)}점 · {levelLabel(Number(r.sr_score))}
                         </span>
                       </div>
                       {m && <p className={styles.entryMemo}>{m}</p>}
@@ -177,12 +182,13 @@ export default function LearningSection({ data, loading, onAdd }: Props) {
             }}
           >
             <Input
-              label="학습 점수 (0~100)"
+              label="학습 점수 (0~100, 소수점 가능)"
               type="number"
-              inputMode="numeric"
+              inputMode="decimal"
+              step="0.1"
               value={srScore}
               onChange={(e) => setSrScore(e.target.value)}
-              placeholder="0~100"
+              placeholder="예: 4.5"
             />
             <Input
               label="측정일"

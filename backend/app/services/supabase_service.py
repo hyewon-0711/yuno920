@@ -185,3 +185,26 @@ class SupabaseService:
             .execute()
         )
         return res.data or []
+
+    def get_active_activities(self, child_id: str) -> list[dict]:
+        res = (
+            self.client.table("child_activities")
+            .select("id,title,area,frequency,status,created_at,updated_at")
+            .eq("child_id", child_id)
+            .eq("status", "active")
+            .order("created_at")
+            .execute()
+        )
+        return res.data or []
+
+    def save_activity_assessment(self, child_id: str, activities: list[dict], result: dict) -> dict:
+        res = self.client.table("activity_assessments").insert({
+            "child_id": child_id,
+            "input_snapshot": activities,
+            "result_json": result,
+            "summary": result["summary"],
+            "score": result["overall_score"],
+        }).execute()
+        if not res.data:
+            raise RuntimeError("활동 분석 결과를 저장하지 못했습니다")
+        return res.data[0]

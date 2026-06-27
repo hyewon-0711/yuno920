@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { postWithAuth } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useChild } from "@/hooks/useChild";
@@ -226,7 +227,7 @@ export default function NewRecordPage() {
           <div className={styles.photoGrid}>
             {previews.map((src, idx) => (
               <div key={idx} className={styles.photoItem}>
-                <img src={src} alt="" className={styles.photoThumb} />
+                <Image src={src} alt="" width={160} height={120} unoptimized className={styles.photoThumb} />
                 <button className={styles.photoRemove} onClick={() => removePhoto(idx)}>✕</button>
               </div>
             ))}

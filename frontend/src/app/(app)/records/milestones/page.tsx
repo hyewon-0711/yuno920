@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { useChild } from "@/hooks/useChild";
 import AppHeader from "@/components/layout/AppHeader";
@@ -54,7 +55,10 @@ export default function MilestonesPage() {
     setLoading(false);
   }, [child]);
 
-  useEffect(() => { fetchMilestones(); }, [fetchMilestones]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => void fetchMilestones(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchMilestones]);
 
   const resetForm = () => {
     setTitle("");
@@ -149,7 +153,7 @@ export default function MilestonesPage() {
                     </div>
                     <span className={styles.catBadge}>{ci.label}</span>
                     {m.description && <p className={styles.cardDesc}>{m.description}</p>}
-                    {m.photo_url && <img src={m.photo_url} alt="" className={styles.cardPhoto} />}
+                    {m.photo_url && <Image src={m.photo_url} alt="" width={320} height={200} unoptimized className={styles.cardPhoto} />}
                     <button className={styles.deleteBtn} onClick={() => handleDelete(m.id)}>삭제</button>
                   </div>
                 </div>
@@ -202,7 +206,7 @@ export default function MilestonesPage() {
               <label className={styles.formLabel}>사진 (선택)</label>
               {photoPreview ? (
                 <div className={styles.previewWrap}>
-                  <img src={photoPreview} alt="" className={styles.preview} />
+                  <Image src={photoPreview} alt="" width={320} height={240} unoptimized className={styles.preview} />
                   <button onClick={() => { setPhoto(null); setPhotoPreview(""); }} className={styles.removePhoto}>✕</button>
                 </div>
               ) : (

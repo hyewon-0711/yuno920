@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useMemo } from "react";
 import AppHeader from "@/components/layout/AppHeader";
 import CelebrationOverlay from "@/components/ui/CelebrationOverlay";
 import styles from "./page.module.css";
@@ -268,7 +268,8 @@ export default function CalculationGamePage() {
   const choices = useMemo(() => generateChoices(question.answer), [question]);
   const questionStory = useMemo(() => {
     const templates = THEME_STORIES[theme][question.op];
-    const picked = templates[Math.floor(Math.random() * templates.length)] ?? "{a} ? {b}";
+    const storyIndex = Math.abs(question.a * 31 + question.b * 17 + question.answer) % templates.length;
+    const picked = templates[storyIndex] ?? "{a} ? {b}";
     return picked
       .replaceAll("{a}", String(question.a))
       .replaceAll("{b}", String(question.b));
@@ -287,12 +288,6 @@ export default function CalculationGamePage() {
     setFeedback(null);
   }, [config]);
 
-  useEffect(() => {
-    setQuestion(generateQuestion(config));
-    setSelectedChoice(null);
-    setFeedback(null);
-  }, [currentLevel]);
-
   const handleChoiceClick = (choice: number) => {
     if (feedback) return;
     setSelectedChoice(choice);
@@ -304,8 +299,12 @@ export default function CalculationGamePage() {
       setFeedback("correct");
 
       if (newCombo >= LEVEL_UP_SCORE && currentLevel < LEVELS.length) {
+        const nextConfig = LEVELS.find((level) => level.level === currentLevel + 1) ?? config;
         setShowCelebration(true);
         setCurrentLevel((l) => l + 1);
+        setQuestion(generateQuestion(nextConfig));
+        setSelectedChoice(null);
+        setFeedback(null);
         setCombo(0);
       } else {
         setTimeout(nextQuestion, 600);
@@ -321,7 +320,9 @@ export default function CalculationGamePage() {
   };
 
   const handleSelectLevel = (level: number) => {
+    const selectedConfig = LEVELS.find((item) => item.level === level) ?? LEVELS[0];
     setCurrentLevel(level);
+    setQuestion(generateQuestion(selectedConfig));
     setCombo(0);
     setTotalCorrect(0);
     setFeedback(null);

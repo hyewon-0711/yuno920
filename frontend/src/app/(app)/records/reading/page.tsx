@@ -47,7 +47,10 @@ export default function ReadingPage() {
     setLoading(false);
   }, [child]);
 
-  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => void fetchLogs(), 0);
+    return () => window.clearTimeout(timer);
+  }, [fetchLogs]);
 
   const resetForm = () => {
     setTitle("");
