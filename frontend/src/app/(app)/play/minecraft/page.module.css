@@ -1,0 +1,24 @@
+.page { min-height: 100%; padding: var(--space-5); background: linear-gradient(180deg, #eef8e8 0%, var(--bg-default) 42%); }
+.startCard, .resultCard { max-width: 680px; margin: 0 auto; padding: var(--space-6) var(--space-5); text-align: center; background: var(--bg-card); border: 3px solid #5b8f3a; border-radius: var(--radius-xl); box-shadow: 0 8px 0 #315d2b, var(--shadow-md); }
+.heroIcon, .trophy { display: grid; place-items: center; width: 76px; height: 76px; margin: 0 auto var(--space-4); font-size: 42px; background: #d9efc9; border: 3px solid #315d2b; border-radius: 16px; }
+.eyebrow { margin-bottom: var(--space-2); color: #4f7c34; font-size: 13px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.startCard h1, .resultCard h1, .questionCard h1 { color: var(--text-primary); line-height: 1.4; }
+.startCard h1 { font-size: 24px; }
+.description, .resultMessage { margin: var(--space-3) 0 var(--space-6); color: var(--text-secondary); line-height: 1.6; }
+.difficultyGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); margin-bottom: var(--space-6); }
+.difficultyButton { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--space-4) var(--space-2); color: var(--text-primary); background: var(--bg-default); border: 2px solid var(--border-default); border-radius: var(--radius-lg); transition: .18s ease; }
+.difficultyButton:hover, .difficultyButton.active { border-color: #5b8f3a; background: #eef8e8; transform: translateY(-2px); }
+.difficultyButton.active { box-shadow: 0 3px 0 #5b8f3a; }
+.difficultyIcon { font-size: 28px; }.difficultyButton small { color: var(--text-tertiary); }
+.primaryButton, .secondaryButton { width: 100%; min-height: 52px; padding: var(--space-3) var(--space-4); font-size: 16px; font-weight: 800; border-radius: var(--radius-lg); transition: .15s ease; }
+.primaryButton { color: white; background: #4f7c34; border: 2px solid #315d2b; box-shadow: 0 4px 0 #315d2b; }.primaryButton:hover { background: #5b8f3a; }.primaryButton:active { transform: translateY(3px); box-shadow: 0 1px 0 #315d2b; }
+.secondaryButton { color: #315d2b; background: white; border: 2px solid #5b8f3a; }
+.statusRow { display: flex; justify-content: space-between; max-width: 680px; margin: 0 auto var(--space-2); color: var(--text-secondary); }
+.progressTrack { max-width: 680px; height: 10px; margin: 0 auto var(--space-5); overflow: hidden; background: #d8e2d3; border-radius: 999px; }.progressBar { height: 100%; background: #5b8f3a; transition: width .25s ease; }
+.questionCard { max-width: 680px; margin: 0 auto var(--space-5); padding: var(--space-6); background: var(--bg-card); border: 2px solid #789d63; border-radius: var(--radius-xl); box-shadow: 0 6px 0 #d1dfc8; }
+.questionNumber { margin-bottom: var(--space-2); color: #5b8f3a; font-weight: 800; }.questionCard h1 { margin-bottom: var(--space-6); font-size: 22px; }
+.options { display: grid; gap: var(--space-3); }.option { display: flex; align-items: center; gap: var(--space-3); min-height: 58px; padding: var(--space-3); text-align: left; color: var(--text-primary); background: var(--bg-default); border: 2px solid var(--border-default); border-radius: var(--radius-lg); font-size: 16px; font-weight: 600; }.option:hover:not(:disabled) { border-color: #5b8f3a; background: #f3faef; }.option span { display: grid; place-items: center; flex: 0 0 32px; height: 32px; background: #e2eadf; border-radius: 8px; }.option.correct { border-color: #2f855a; background: #e6f7ed; }.option.wrong { border-color: #c53030; background: #fff0f0; }
+.feedback { margin-top: var(--space-5); padding: var(--space-4); text-align: left; border-radius: var(--radius-lg); line-height: 1.55; }.feedback p { margin-top: 4px; }.feedbackCorrect { color: #235c3d; background: #e6f7ed; }.feedbackWrong { color: #8b2929; background: #fff0f0; }
+.resultCard { margin-top: var(--space-5); }.resultCard h1 { font-size: 30px; }.resultActions { display: grid; gap: var(--space-3); }
+@media (max-width: 560px) { .page { padding: var(--space-4); }.difficultyGrid { grid-template-columns: 1fr; }.difficultyButton { flex-direction: row; justify-content: flex-start; padding: var(--space-3); }.difficultyButton small { margin-left: auto; }.questionCard { padding: var(--space-5) var(--space-4); }.questionCard h1 { font-size: 19px; } }
+@media (prefers-reduced-motion: reduce) { .difficultyButton, .primaryButton, .progressBar { transition: none; } }
