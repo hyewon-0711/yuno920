@@ -1,0 +1,53 @@
+.page {
+  min-height: 100vh;
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  background: linear-gradient(180deg, #fffaf0 0%, var(--bg-primary) 55%);
+}
+
+.statusCard, .captureRow, .actions, .help, .resultCard { width: min(100%, 540px); }
+.statusCard { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); box-shadow: var(--shadow-sm); }
+.statusCard p { margin-top: 4px; color: var(--text-secondary); font-size: 14px; }
+.turnRow { display: flex; align-items: center; gap: var(--space-2); font-size: 17px; }
+.turnStone { width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 2px 5px #0005; }
+.black { background: radial-gradient(circle at 35% 30%, #555, #080808 65%); }
+.white { background: radial-gradient(circle at 35% 30%, #fff, #ddd 70%); }
+
+.captureRow { display: flex; justify-content: space-between; gap: var(--space-2); font-size: 13px; color: var(--text-secondary); }
+.captureRow span { background: #fff8e8; border-radius: var(--radius-full); padding: 7px 10px; }
+
+.boardFrame { width: min(100%, 540px); padding: clamp(14px, 4vw, 24px); background: #bd7b35; border: 5px solid #8a5425; border-radius: 14px; box-shadow: 0 10px 22px #64380e35, inset 0 0 0 2px #e6ad63; }
+.board { display: grid; grid-template-columns: repeat(9, 1fr); aspect-ratio: 1; background-color: #dca354; background-image: linear-gradient(#70461f 1px, transparent 1px), linear-gradient(90deg, #70461f 1px, transparent 1px); background-size: 12.5% 12.5%; background-position: center; }
+.point { position: relative; border: 0; padding: 0; background: transparent; cursor: pointer; min-width: 0; }
+.point::after { content: ""; position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #70461f; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0; }
+.point:nth-child(21)::after, .point:nth-child(25)::after, .point:nth-child(41)::after, .point:nth-child(57)::after, .point:nth-child(61)::after { opacity: 1; }
+.point:not(:disabled):hover::before { content: ""; position: absolute; width: 82%; aspect-ratio: 1; border-radius: 50%; background: #2223; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.stone { position: absolute; z-index: 1; width: 88%; aspect-ratio: 1; border-radius: 50%; left: 50%; top: 50%; transform: translate(-50%, -50%); box-shadow: 0 3px 5px #0007; animation: placeStone .18s ease-out; }
+.lastMove { position: absolute; width: 24%; aspect-ratio: 1; border-radius: 50%; background: #ff6b4a; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+@keyframes placeStone { from { transform: translate(-50%, -50%) scale(.55); } to { transform: translate(-50%, -50%) scale(1); } }
+
+.actions { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: var(--space-2); }
+.actions button { min-height: 44px; border-radius: var(--radius-lg); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.actions button:disabled { opacity: .45; cursor: default; }
+.secondaryButton { border: 1px solid var(--border-default); color: var(--text-secondary); background: var(--bg-card); }
+.passButton { border: 0; color: white; background: linear-gradient(135deg, #7950c8, var(--tab-play)); }
+.resultCard { padding: var(--space-4); text-align: center; border-radius: var(--radius-xl); background: #fff4cc; border: 2px solid #f1c85b; }
+.resultCard h2 { font-size: 21px; margin: 2px 0 5px; }
+.resultCard p { color: var(--text-secondary); }
+.resultCard small { display: block; margin-top: 5px; color: var(--text-tertiary); }
+.resultEmoji { font-size: 30px; }
+.help { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); color: var(--text-secondary); font-size: 14px; }
+.help summary { color: var(--text-primary); font-weight: 600; cursor: pointer; }
+.help p { margin-top: var(--space-2); line-height: 1.65; }
+
+@media (max-width: 420px) {
+  .page { padding-inline: var(--space-3); }
+  .actions { grid-template-columns: 1fr 1fr; }
+  .passButton { grid-column: 1 / -1; grid-row: 1; }
+  .captureRow { font-size: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) { .stone { animation: none; } }
