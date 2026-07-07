@@ -6,6 +6,7 @@ import styles from "./page.module.css";
 
 const games = [
   { icon: "⚫", name: "윤호의 9줄 바둑", desc: "기본 규칙을 배우며 함께 대국해요", href: "/play/baduk" },
+  { icon: "⛏️", name: "마인크래프트 퀴즈", desc: "블록 세계 지식에 도전하기", href: "/play/minecraft" },
   { icon: "🔢", name: "계산 게임", desc: "더하기·빼기·곱하기·나누기", href: "/play/calculation" },
   { icon: "🧠", name: "기억력 게임", desc: "카드 짝 맞추기", href: "/play/memory" },
   { icon: "📖", name: "상식 퀴즈", desc: "영역별 상식 퀴즈", href: "/play/quiz" },
