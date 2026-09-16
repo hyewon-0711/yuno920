@@ -3,10 +3,11 @@
 .intro > span { font-size: 42px; }
 .intro h2 { font-size: 22px; margin: 8px 0; }
 .intro p, .note { color: var(--text-secondary); font-size: 13px; line-height: 1.7; }
-.switches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.switches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 .switches button { display: flex; flex-direction: column; align-items: center; gap: 7px; border: 2px solid transparent; border-radius: 16px; padding: 14px 4px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; box-shadow: var(--shadow-sm); }
 .switches button > span { font-size: 26px; }
 .switches small { font-size: 11px; color: var(--text-secondary); }
+.switches strong { font-size: 13px; word-break: keep-all; }
 .switches button[aria-pressed="true"] { border-color: var(--switch-color); }
 .soundPanel, .challenge { background: var(--bg-card); padding: 16px; border-radius: 16px; }
 .soundPanel p { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
@@ -25,7 +26,8 @@
 .counter { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-size: 14px; }
 .counter strong { color: var(--switch-color); }
 .challenge { text-align: center; font-size: 13px; line-height: 1.8; }
-.word { display: flex; justify-content: center; gap: 8px; margin: 12px 0; }
+.prompt { display: block; font-size: 24px; margin-bottom: 8px; }
+.word { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 12px 0; }
 .word span { padding: 4px 8px; border-radius: 6px; font-size: 23px; font-weight: 700; color: var(--text-tertiary); }
 .word .done { color: #347458; background: #e4f3e9; }
 .word .next { color: #6f5100; background: #fff2ba; box-shadow: 0 0 0 2px #d7a822; }
@@ -33,3 +35,4 @@
 .error { font-size: 13px; color: #b34135; }
 @media (max-width: 420px) { .page { padding: 16px 12px; } .keyboard { padding: 14px 6px; } .row { gap: 4px; } .key { height: 42px; font-size: 13px; border-radius: 5px; } .intro h2 { font-size: 20px; } }
 @media (prefers-reduced-motion: reduce) { .key { transition: none; } }
+@media (max-width: 520px) { .switches { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
