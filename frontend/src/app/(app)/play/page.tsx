@@ -5,6 +5,8 @@ import AppHeader from "@/components/layout/AppHeader";
 import styles from "./page.module.css";
 
 const games = [
+  { icon: "⌨️", name: "키캡 소리 놀이", desc: "청축부터 바나나축까지 톡톡!", href: "/play/keyboard" },
+  { icon: "♟️", name: "체스", desc: "컴퓨터와 연습하거나 함께 두기", href: "/play/chess" },
   { icon: "⚫", name: "윤호의 9줄 바둑", desc: "기본 규칙을 배우며 함께 대국해요", href: "/play/baduk" },
   { icon: "⛏️", name: "마인크래프트 퀴즈", desc: "블록 세계 지식에 도전하기", href: "/play/minecraft" },
   { icon: "🔢", name: "계산 게임", desc: "더하기·빼기·곱하기·나누기", href: "/play/calculation" },

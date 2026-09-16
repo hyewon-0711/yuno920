@@ -1,0 +1,28 @@
+.page { max-width: 600px; margin: 0 auto; padding: var(--space-5); display: flex; flex-direction: column; gap: 16px; }
+.intro h2 { font-size: 22px; margin-bottom: 8px; }
+.intro p, .note { color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.controls button { border: 1px solid var(--border-color, #d7ddd5); border-radius: 12px; padding: 10px 14px; background: var(--bg-card); color: var(--text-primary); cursor: pointer; font: inherit; font-size: 13px; }
+.controls button[aria-pressed="true"] { background: #305c43; color: white; border-color: #305c43; }
+.controls button:disabled { opacity: .45; cursor: default; }
+.controls button:focus-visible, .help summary:focus-visible { outline: 3px solid #d78b17; outline-offset: 2px; }
+.status { padding: 14px; border-radius: 12px; background: var(--bg-card); font-weight: 600; line-height: 1.5; }
+.board { width: 100%; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); border: 4px solid #305c43; border-radius: 8px; overflow: hidden; }
+.square { position: relative; aspect-ratio: 1; padding: 0; border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: clamp(24px, 7vw, 48px); font-family: "Segoe UI Symbol", "Apple Symbols", serif; }
+.square:disabled { cursor: default; opacity: 1; }
+.light { background: #f1ecd9; }
+.dark { background: #7c9b78; }
+.last { box-shadow: inset 0 0 0 4px #d7c460; }
+.selected, .square:focus-visible { outline: 4px solid #e4a21c; outline-offset: -4px; z-index: 1; }
+.check { background: #dc8b7a; }
+.coordinate { position: absolute; top: 2px; left: 3px; font: 9px/1 sans-serif; color: #273d2d; }
+.whitePiece { color: #fffdf2; text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333; }
+.blackPiece { color: #202b25; text-shadow: 0 1px 1px #f1ecd9; }
+.dot { position: absolute; width: 24%; height: 24%; border-radius: 50%; background: #284f44aa; pointer-events: none; }
+.capture { position: absolute; inset: 3px; border: 4px solid #b85627; border-radius: 50%; pointer-events: none; }
+.promotion, .help { background: var(--bg-card); border-radius: 12px; padding: 16px; font-size: 13px; line-height: 1.8; }
+.promotion p { margin-bottom: 10px; }
+.help summary { cursor: pointer; font-weight: 600; }
+.help ul { padding-left: 20px; margin: 12px 0; }
+.history { overflow-wrap: anywhere; margin-top: 10px; }
+@media (max-width: 360px) { .page { padding: 12px; } .controls button { padding: 9px 10px; } }
