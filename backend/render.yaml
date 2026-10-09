@@ -20,3 +20,22 @@ services:
         sync: false
       - key: VAPID_SUBJECT
         value: mailto:hello@yuno920.com
+
+  - type: cron
+    name: yuno920-daily-missions
+    runtime: python
+    rootDir: backend
+    schedule: "0 22 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m app.jobs.daily_missions
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: APP_TIMEZONE
+        value: Asia/Seoul
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      - key: VAPID_SUBJECT
+        value: mailto:hello@yuno920.com

@@ -235,3 +235,51 @@ class SupabaseService:
 
     def delete_web_push_subscription_by_id(self, subscription_id: str) -> None:
         self.client.table("web_push_subscriptions").delete().eq("id", subscription_id).execute()
+
+    def get_approved_memberships(self) -> list[dict]:
+        result = (
+            self.client.table("membership_approvals")
+            .select("user_id")
+            .eq("status", "approved")
+            .execute()
+        )
+        return result.data or []
+
+    def get_children_for_users(self, user_ids: list[str]) -> list[dict]:
+        if not user_ids:
+            return []
+        result = (
+            self.client.table("children")
+            .select("id,user_id")
+            .in_("user_id", user_ids)
+            .execute()
+        )
+        return result.data or []
+
+    def get_active_mission_templates(self) -> list[dict]:
+        result = (
+            self.client.table("mission_templates")
+            .select("id,title,description,area,estimated_minutes,difficulty,is_bonus")
+            .eq("active", True)
+            .order("id")
+            .execute()
+        )
+        return result.data or []
+
+    def get_daily_missions_for_date(self, target_date: date) -> list[dict]:
+        result = (
+            self.client.table("daily_missions")
+            .select("child_id,slot")
+            .eq("mission_date", target_date.isoformat())
+            .execute()
+        )
+        return result.data or []
+
+    def upsert_daily_missions(self, rows: list[dict]) -> None:
+        if not rows:
+            return
+        self.client.table("daily_missions").upsert(
+            rows,
+            on_conflict="child_id,mission_date,slot",
+            ignore_duplicates=True,
+        ).execute()
