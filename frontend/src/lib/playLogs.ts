@@ -16,6 +16,7 @@ export async function logPlaySession(input: {
   correctCount?: number;
   totalCount?: number;
   startedAt: number;
+  metadata?: Record<string, unknown>;
 }) {
   const { error } = await supabase.from("play_logs").insert({
     child_id: input.childId,
@@ -25,6 +26,7 @@ export async function logPlaySession(input: {
     correct_count: input.correctCount ?? 0,
     total_count: input.totalCount ?? 0,
     duration_seconds: Math.max(1, Math.round((Date.now() - input.startedAt) / 1000)),
+    metadata: input.metadata ?? {},
   });
 
   if (error) throw error;

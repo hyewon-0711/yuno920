@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AppHeader from "@/components/layout/AppHeader";
 import PageIntro from "@/components/layout/PageIntro";
 import { useChild } from "@/hooks/useChild";
+import { supabase } from "@/lib/supabase";
 import { logPlaySession } from "@/lib/playLogs";
 import styles from "./page.module.css";
 
@@ -14,12 +15,36 @@ export default function StudioPage() {
   const [selectedColor, setSelectedColor] = useState(COLORS[1]);
   const [pixels, setPixels] = useState(() => Array.from({ length: 64 }, () => COLORS[0]));
   const [saved, setSaved] = useState(false);
+  const [savedWorks, setSavedWorks] = useState<string[][]>([]);
   const startedAt = useRef<number | null>(null);
   const coloredCount = useMemo(() => pixels.filter((color) => color !== COLORS[0]).length, [pixels]);
 
   useEffect(() => {
     startedAt.current = Date.now();
   }, []);
+
+  useEffect(() => {
+    if (!child) return;
+    let cancelled = false;
+    void supabase
+      .from("play_logs")
+      .select("metadata")
+      .eq("child_id", child.id)
+      .eq("game_type", "pixel_studio")
+      .order("created_at", { ascending: false })
+      .limit(6)
+      .then(({ data }) => {
+        if (cancelled) return;
+        const works = (data || []).flatMap((row) => {
+          const metadata = row.metadata as { pixels?: unknown } | null;
+          return Array.isArray(metadata?.pixels) && metadata.pixels.length === 64
+            ? [metadata.pixels.filter((pixel): pixel is string => typeof pixel === "string")]
+            : [];
+        });
+        setSavedWorks(works);
+      });
+    return () => { cancelled = true; };
+  }, [child]);
 
   const paint = (index: number) => {
     setPixels((prev) => prev.map((color, i) => i === index ? selectedColor : color));
@@ -34,7 +59,8 @@ export default function StudioPage() {
   const save = async () => {
     if (!child || coloredCount === 0) return;
     try {
-      await logPlaySession({ childId: child.id, gameType: "pixel_studio", score: coloredCount * 5, totalCount: 64, correctCount: coloredCount, startedAt: startedAt.current ?? Date.now() });
+      await logPlaySession({ childId: child.id, gameType: "pixel_studio", score: coloredCount * 5, totalCount: 64, correctCount: coloredCount, startedAt: startedAt.current ?? Date.now(), metadata: { pixels } });
+      setSavedWorks((prev) => [pixels, ...prev].slice(0, 6));
       setSaved(true);
     } catch (error) {
       console.error("Failed to save pixel studio log", error);
@@ -53,6 +79,18 @@ export default function StudioPage() {
           <button type="button" className={styles.saveButton} onClick={() => void save()} disabled={coloredCount === 0 || saved}>{saved ? "작품 기록 완료" : "작품 기록하기"}</button>
           {saved && <p className={styles.savedMessage}>멋진 작품이 오늘의 놀이 기록에 저장되었어요!</p>}
         </section>
+        {savedWorks.length > 0 && (
+          <section className={styles.gallery}>
+            <h2>최근 작품</h2>
+            <div className={styles.galleryGrid}>
+              {savedWorks.map((work, workIndex) => (
+                <div key={`${workIndex}-${work.join("")}`} className={styles.galleryItem} aria-label={`최근 작품 ${workIndex + 1}`}>
+                  {work.map((color, index) => <span key={index} style={{ backgroundColor: color }} />)}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
     </>
   );

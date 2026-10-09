@@ -10,4 +10,9 @@
 .saveButton { width: 100%; border: 0; border-radius: var(--radius-md); padding: 14px; background: var(--brand-primary); color: white; font-weight: 700; cursor: pointer; }
 .saveButton:disabled { opacity: .45; cursor: not-allowed; }
 .savedMessage { color: var(--status-success); text-align: center; font-size: 13px; margin: 12px 0 0; }
+.gallery { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-xl); padding: var(--space-5); box-shadow: var(--shadow-sm); }
+.gallery h2 { margin: 0 0 14px; font-size: 18px; }
+.galleryGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.galleryItem { aspect-ratio: 1; display: grid; grid-template-columns: repeat(8, 1fr); border: 1px solid var(--border-default); background: white; }
+.galleryItem span { border: 1px solid #edf0f4; }
 @media (min-width: 760px) { .page { max-width: 720px; margin: 0 auto; } }
