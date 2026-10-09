@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""
     # Supabase 대시보드 → Project Settings → API → JWT Secret (auth.verify용)
     supabase_jwt_secret: str = ""
+    vapid_private_key: str = ""
+    vapid_subject: str = "mailto:hello@yuno920.com"
     # 도우미·일정·기록 조회의 '오늘' 기준 (IANA, 예: Asia/Seoul)
     app_timezone: str = "Asia/Seoul"
 

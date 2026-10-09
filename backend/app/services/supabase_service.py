@@ -208,3 +208,30 @@ class SupabaseService:
         if not res.data:
             raise RuntimeError("활동 분석 결과를 저장하지 못했습니다")
         return res.data[0]
+
+    def upsert_web_push_subscription(self, user_id: str, subscription: dict) -> None:
+        self.client.table("web_push_subscriptions").upsert(
+            {
+                "user_id": user_id,
+                "endpoint": subscription["endpoint"],
+                "p256dh": subscription["keys"]["p256dh"],
+                "auth": subscription["keys"]["auth"],
+                "expiration_time": subscription.get("expiration_time"),
+            },
+            on_conflict="endpoint",
+        ).execute()
+
+    def get_web_push_subscriptions(self, user_id: str) -> list[dict]:
+        result = (
+            self.client.table("web_push_subscriptions")
+            .select("id,endpoint,p256dh,auth,expiration_time")
+            .eq("user_id", user_id)
+            .execute()
+        )
+        return result.data or []
+
+    def delete_web_push_subscription(self, user_id: str, endpoint: str) -> None:
+        self.client.table("web_push_subscriptions").delete().eq("user_id", user_id).eq("endpoint", endpoint).execute()
+
+    def delete_web_push_subscription_by_id(self, subscription_id: str) -> None:
+        self.client.table("web_push_subscriptions").delete().eq("id", subscription_id).execute()

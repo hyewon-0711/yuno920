@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { usePathname, useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { canUseService, getMembership } from "@/lib/membership";
-import styles from "@/app/auth/login/page.module.css";
+import styles from "./MembershipGate.module.css";
 
 export default function MembershipGate({ children, operatorOnly = false }: { children: ReactNode; operatorOnly?: boolean }) {
   const router = useRouter();
@@ -16,6 +16,7 @@ export default function MembershipGate({ children, operatorOnly = false }: { chi
 
   const check = useCallback(async () => {
     const ticket = ++generation.current;
+    setError("");
     try {
       const { data: { user }, error: authError } = await supabase.auth.getUser();
       if (ticket !== generation.current) return;
@@ -65,9 +66,31 @@ export default function MembershipGate({ children, operatorOnly = false }: { chi
   }, [check, invalidate, router]);
 
   if (allowedPath === pathname && !error) return children;
-  return <main className={styles.gate}>
-    <p role={error ? "alert" : "status"}>{error || "이용 권한을 확인하고 있어요…"}</p>
-    {error && <button className={styles.submitBtn} onClick={() => void check()}>다시 확인하기</button>}
-    <a className={styles.link} href="/auth/pending">내 가입 상태 확인</a>
+  return <main className={styles.screen} aria-busy={!error}>
+    <div className={styles.glow} aria-hidden="true" />
+    <section className={styles.card}>
+      <div className={styles.brandLockup}>
+        <span className={styles.brandMark} aria-hidden="true"><span /></span>
+        <span className={styles.brandName}>Yuno<span>920</span></span>
+      </div>
+
+      {error ? <div className={styles.errorState}>
+        <span className={styles.errorIcon} aria-hidden="true">!</span>
+        <span className={styles.overline}>SORRY, ONE MORE STEP</span>
+        <h1>잠시 확인이 필요해요</h1>
+        <p role="alert">{error}</p>
+        <button className={styles.retryButton} onClick={() => void check()}>다시 확인하기</button>
+        <a className={styles.link} href="/auth/pending">내 가입 상태 확인</a>
+      </div> : <div className={styles.loadingState}>
+        <div className={styles.loader} role="progressbar" aria-label="가입 상태 확인 중">
+          <span className={styles.loaderCore} aria-hidden="true"><span /></span>
+        </div>
+        <span className={styles.overline}>JUST A MOMENT</span>
+        <h1>우리의 공간을 준비하고 있어요</h1>
+        <p className={styles.description} role="status">가입 상태를 안전하게 확인하고 있어요.<br />곧 아이의 이야기가 이어집니다.</p>
+        <div className={styles.progressTrack} aria-hidden="true"><span /></div>
+        <p className={styles.waitNote}>잠시만 기다려주세요</p>
+      </div>}
+    </section>
   </main>;
 }

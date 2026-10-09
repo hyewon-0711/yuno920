@@ -13,6 +13,7 @@ import ScheduleSection from "./components/ScheduleSection";
 import WeeklyTimetableSection from "./components/WeeklyTimetableSection";
 import ReadingSection from "./components/ReadingSection";
 import CoachingSection from "./components/CoachingSection";
+import MissionBoard from "@/components/missions/MissionBoard";
 import styles from "./page.module.css";
 
 export default function DashboardPage() {
@@ -59,6 +60,8 @@ export default function DashboardPage() {
       <AppHeader title="우리 아이의 하루" />
       <div className={styles.page}>
         <PageIntro eyebrow="LITTLE MOMENTS, BIG GROWTH" title={`${child.name}의 오늘도, 함께`} description="함께한 시간과 작은 성장을 모아, 우리 아이만의 하루를 만들어가요." />
+
+        <MissionBoard childId={child.id} compact />
 
         <ScheduleSection
           schedules={schedules}

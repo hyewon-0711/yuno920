@@ -6,6 +6,7 @@ import Image from "next/image";
 import { postWithAuth } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { useChild } from "@/hooks/useChild";
+import { MAX_RECORD_PHOTO_SIZE, uploadRecordPhotos } from "@/lib/recordPhotos";
 import AppHeader from "@/components/layout/AppHeader";
 import { Button } from "@/components/ui";
 import EmotionSelector, { type Mood } from "@/components/ui/EmotionSelector";
@@ -49,6 +50,14 @@ export default function NewRecordPage() {
       setError("사진은 최대 5장까지 가능합니다");
       return;
     }
+    if (files.some((file) => !file.type.startsWith("image/"))) {
+      setError("이미지 파일만 업로드할 수 있습니다.");
+      return;
+    }
+    if (files.some((file) => file.size > MAX_RECORD_PHOTO_SIZE)) {
+      setError("사진은 한 장당 10MB 이하만 업로드할 수 있습니다.");
+      return;
+    }
     setPhotos((prev) => [...prev, ...files]);
     const newPreviews = files.map((f) => URL.createObjectURL(f));
     setPreviews((prev) => [...prev, ...newPreviews]);
@@ -61,20 +70,6 @@ export default function NewRecordPage() {
       URL.revokeObjectURL(prev[idx]);
       return prev.filter((_, i) => i !== idx);
     });
-  };
-
-  const uploadPhotos = async (childId: string): Promise<string[]> => {
-    const urls: string[] = [];
-    for (const file of photos) {
-      const ext = file.name.split(".").pop();
-      const path = `${childId}/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-      const { error } = await supabase.storage.from("record-photos").upload(path, file);
-      if (!error) {
-        const { data } = supabase.storage.from("record-photos").getPublicUrl(path);
-        urls.push(data.publicUrl);
-      }
-    }
-    return urls;
   };
 
   const handleSave = async () => {
@@ -95,18 +90,16 @@ export default function NewRecordPage() {
         throw new Error("로그인 정보가 없어요. 다시 로그인 후 시도해 주세요.");
       }
 
-      let photoUrls: string[] = [];
-      if (photos.length > 0) {
-        photoUrls = await uploadPhotos(child.id);
-      }
+      const recordId = crypto.randomUUID();
 
       const basePayload = {
+        id: recordId,
         child_id: child.id,
         user_id: userId,
         content: content.trim(),
         mood: mood || null,
         categories: selectedCats,
-        photos: photoUrls,
+        photos: [],
         recorded_at: today,
       };
 
@@ -137,6 +130,24 @@ export default function NewRecordPage() {
       }
 
       if (insertErr) throw insertErr;
+
+      let uploadedPaths: string[] = [];
+      try {
+        if (photos.length > 0) {
+          uploadedPaths = await uploadRecordPhotos(child.id, recordId, photos);
+          const { error: photoUpdateError } = await supabase
+            .from("records")
+            .update({ photos: uploadedPaths })
+            .eq("id", recordId);
+          if (photoUpdateError) throw photoUpdateError;
+        }
+      } catch (photoError) {
+        if (uploadedPaths.length > 0) {
+          await supabase.storage.from("record-photos").remove(uploadedPaths);
+        }
+        await supabase.from("records").delete().eq("id", recordId);
+        throw photoError;
+      }
 
       if (data?.id && content.trim().length > 10) {
         try {

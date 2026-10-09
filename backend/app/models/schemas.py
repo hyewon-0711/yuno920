@@ -14,6 +14,27 @@ class DateRangeRequest(BaseModel):
     end_date: date
 
 
+# ========== Web Push ==========
+class PushSubscriptionKeys(BaseModel):
+    p256dh: str = Field(min_length=1, max_length=512)
+    auth: str = Field(min_length=1, max_length=512)
+
+
+class PushSubscriptionRequest(BaseModel):
+    endpoint: str = Field(min_length=1, max_length=2048)
+    expiration_time: float | None = None
+    keys: PushSubscriptionKeys
+
+
+class PushUnsubscribeRequest(BaseModel):
+    endpoint: str = Field(min_length=1, max_length=2048)
+
+
+class PushSendResponse(BaseModel):
+    sent: int
+    removed: int = 0
+
+
 # ========== AI Auto tag ==========
 class AutoTagRequest(BaseModel):
     record_id: str

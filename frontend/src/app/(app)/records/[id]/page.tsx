@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { getRecordPhotoUrls, removeRecordPhotos } from "@/lib/recordPhotos";
 import AppHeader from "@/components/layout/AppHeader";
 import { Button } from "@/components/ui";
 import EmotionSelector, { type Mood } from "@/components/ui/EmotionSelector";
@@ -25,6 +26,7 @@ interface RecordData {
   mood: string | null;
   categories: string[];
   photos: string[];
+  photoUrls: string[];
   recorded_at: string;
   created_at: string;
 }
@@ -41,6 +43,7 @@ export default function RecordDetailPage() {
   const [mood, setMood] = useState<Mood | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchRecord = useCallback(async () => {
     const { data } = await supabase
@@ -49,7 +52,14 @@ export default function RecordDetailPage() {
       .eq("id", recordId)
       .single();
     if (data) {
-      setRecord(data as RecordData);
+      const photos = (data.photos || []) as string[];
+      let photoUrls = photos;
+      try {
+        photoUrls = await getRecordPhotoUrls(photos);
+      } catch {
+        setError("사진을 불러오지 못했습니다.");
+      }
+      setRecord({ ...(data as RecordData), photos, photoUrls });
       setTitle(data.title || "");
       setContent(data.content);
       setMood(data.mood as Mood | undefined);
@@ -79,7 +89,16 @@ export default function RecordDetailPage() {
 
   const handleDelete = async () => {
     if (!confirm("정말 삭제할까요? 이 작업은 되돌릴 수 없습니다.")) return;
-    await supabase.from("records").delete().eq("id", recordId);
+    if (!record) return;
+    setError("");
+    try {
+      await removeRecordPhotos(record.photos);
+      const { error: deleteError } = await supabase.from("records").delete().eq("id", recordId);
+      if (deleteError) throw deleteError;
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : "기록 삭제에 실패했습니다.");
+      return;
+    }
     router.push("/records");
   };
 
@@ -171,9 +190,11 @@ export default function RecordDetailPage() {
           </div>
         )}
 
-        {record.photos && record.photos.length > 0 && (
+        {error && <p style={{ color: "var(--status-error)", marginTop: "var(--space-4)" }}>{error}</p>}
+
+        {record.photoUrls && record.photoUrls.length > 0 && (
           <div className={styles.photoGrid}>
-            {record.photos.map((url, i) => (
+            {record.photoUrls.map((url, i) => (
               <Image key={i} src={url} alt="" width={320} height={240} unoptimized className={styles.photo} />
             ))}
           </div>

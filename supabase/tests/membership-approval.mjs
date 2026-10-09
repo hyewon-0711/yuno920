@@ -20,7 +20,7 @@ await db.exec(`
 `);
 const migrations = new URL('../migrations/', import.meta.url);
 const names = (await readdir(migrations)).filter(n => n.endsWith('.sql')).sort();
-for (const name of names.filter(n => !n.startsWith('012'))) await db.exec(await readFile(new URL(name, migrations), 'utf8'));
+for (const name of names.filter(n => !n.startsWith('012') && !n.startsWith('015'))) await db.exec(await readFile(new URL(name, migrations), 'utf8'));
 await db.exec('GRANT ALL ON ALL TABLES IN SCHEMA public, storage TO anon, authenticated, service_role; GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;');
 
 const operator = '00000000-0000-0000-0000-000000000001';
@@ -31,6 +31,7 @@ const newcomer = '00000000-0000-0000-0000-000000000005';
 await db.query('INSERT INTO auth.users(id,email,email_confirmed_at) VALUES ($1,$2,now()),($3,$4,now()),($5,$6,null)', [operator,'operator@example.test',member,'member@example.test',unverified,'unverified@example.test']);
 await db.query("INSERT INTO public.children(id,user_id,name,birth_date,gender) VALUES ($1,$2,'Test child','2020-01-01','male')", [child,member]);
 await db.exec(await readFile(new URL('012_membership_approval.sql', migrations), 'utf8'));
+await db.exec(await readFile(new URL('015_daily_missions.sql', migrations), 'utf8'));
 
 async function asUser(id, work, role = 'authenticated') {
   return db.transaction(async tx => {
@@ -74,13 +75,29 @@ await denied(operator, "SELECT public.review_membership($1,'suspended',1,'self')
 await asUser(operator, tx=>tx.query("SELECT public.review_membership($1,'approved',1,'Reviewed')",[member]));
 assert.equal(await value(member,'SELECT public.is_approved_member()'),true);
 assert.equal(await value(member,'SELECT count(*)::int FROM public.children'),1);
+assert.equal(await value(member,'SELECT count(*)::int FROM public.mission_templates'),15);
+const missionId = '00000000-0000-0000-0000-000000000007';
+await asUser(member, tx => tx.query(
+  "INSERT INTO public.daily_missions(id,child_id,mission_date,slot,title_snapshot,description_snapshot,area) VALUES ($1,$2,'2026-10-09',0,'Move together','Try a movement game','physical')",
+  [missionId, child],
+));
+assert.equal(await value(member,'SELECT count(*)::int FROM public.daily_missions WHERE id=$1',[missionId]),1);
+assert.equal(await value(operator,'SELECT count(*)::int FROM public.daily_missions WHERE id=$1',[missionId]),0);
 assert.equal(await value(member,'SELECT public.is_service_operator()'),false);
 await denied(member,'SELECT * FROM public.list_memberships()'); // family admin is not an operator
 await denied(operator, "SELECT public.review_membership($1,'suspended',1,'Stale')",[member]);
 await denied(operator, "SELECT public.review_membership($1,'rejected',2,'Invalid transition')",[member]);
 await denied(operator, "SELECT public.review_membership($1,'suspended',2,'   ')",[member]);
 assert.equal((await db.query('SELECT count(*)::int n FROM public.membership_review_log')).rows[0].n,1);
-await asUser(member,tx=>tx.query("INSERT INTO storage.objects(bucket_id,name) VALUES ('record-photos','allowed.jpg')"));
+const recordId = '00000000-0000-0000-0000-000000000006';
+await asUser(member, tx => tx.query(
+  "INSERT INTO public.records(id,child_id,user_id,content) VALUES ($1,$2,$3,'Photo record')",
+  [recordId, child, member],
+));
+await asUser(member, tx => tx.query(
+  "INSERT INTO storage.objects(bucket_id,name) VALUES ('record-photos',$1)",
+  [`${child}/${recordId}/allowed.jpg`],
+));
 console.log('PASS verified approval, audit, stale decisions, transitions and family/operator separation');
 
 await asUser(operator, tx=>tx.query("SELECT public.review_membership($1,'suspended',2,'Access revoked')",[member]));

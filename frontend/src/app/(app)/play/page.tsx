@@ -31,6 +31,9 @@ export default function PlayPage() {
                 <span className={styles.gameDesc}>{g.desc}</span>
               </>
             );
+            if (!g.href) {
+              return <Link key={g.name} href="/play/missions" className={styles.gameCard}>{card}</Link>;
+            }
             return g.href ? (
               <Link key={g.name} href={g.href} className={styles.gameCard}>
                 {card}

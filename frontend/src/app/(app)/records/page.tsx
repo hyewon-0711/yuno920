@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { removeRecordPhotos } from "@/lib/recordPhotos";
 import { useChild } from "@/hooks/useChild";
 import AppHeader from "@/components/layout/AppHeader";
 import PageIntro from "@/components/layout/PageIntro";
@@ -57,8 +58,15 @@ export default function RecordsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("이 기록을 삭제할까요?")) return;
-    await supabase.from("records").delete().eq("id", id);
-    fetchRecords();
+    try {
+      const record = records.find((item) => item.id === id);
+      if (record) await removeRecordPhotos(record.photos);
+      const { error } = await supabase.from("records").delete().eq("id", id);
+      if (error) throw error;
+      fetchRecords();
+    } catch (error) {
+      console.error("Failed to delete record photos or record", error);
+    }
   };
 
   return (

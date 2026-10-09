@@ -14,6 +14,7 @@ import { getSupabaseErrorMessage, hintForMissingInterestColumn } from "@/lib/sup
 import { normalizeInterestIds, type ParentInterestId } from "@/lib/parentInterests";
 import styles from "./page.module.css";
 import SettingsDataSections from "./SettingsDataSections";
+import PushNotificationSettings from "@/components/notifications/PushNotificationSettings";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -107,6 +108,7 @@ export default function SettingsPage() {
       <AppHeader title="설정" showBack />
       <div className={styles.page}>
         <PageIntro eyebrow="OUR FAMILY SPACE" title="우리 가족에게 맞게" description="아이의 프로필과 가족, 관심사를 한곳에서 관리해요." />
+        <PushNotificationSettings />
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>부모 관심사</h2>
           <p className={styles.cardDesc}>Insight의 데일리 트렌드 뉴스에 반영됩니다. (최대 6개)</p>
