@@ -20,10 +20,10 @@
   grid-template-columns: minmax(0, 1fr) 86px;
   gap: var(--space-4);
   align-items: center;
-  padding: var(--space-5);
-  border: 1px solid #fed7aa;
+  padding: var(--page-padding);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 58%, #eff6ff 100%);
+  background: linear-gradient(135deg, var(--surface-primary), var(--bg-card));
 }
 
 .eyebrow {
@@ -78,7 +78,7 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
   background: var(--bg-card);
-  padding: var(--space-5);
+  padding: var(--page-padding);
 }
 
 .sectionHead,
@@ -142,6 +142,43 @@
   gap: var(--space-3);
 }
 
+.plannedEmpty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  background: var(--bg-default);
+}
+
+.plannedEmpty strong {
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.plannedEmpty p {
+  margin: var(--space-1) 0 0;
+  font-size: 13px;
+}
+
+.plannedCard {
+  border-style: dashed;
+  background: var(--bg-muted);
+}
+
+.startDateBadge {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border-radius: var(--radius-full);
+  background: #e8eff0;
+  color: #496c78;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .activityCard {
   width: 100%;
   min-height: 78px;
@@ -177,13 +214,13 @@
   white-space: nowrap;
 }
 
-.areaLearning { background: #dbeafe; color: #1d4ed8; }
-.areaPhysical { background: #dcfce7; color: #166534; }
-.areaCreative { background: #ede9fe; color: #6d28d9; }
-.areaSocial { background: #ffedd5; color: #c2410c; }
-.areaEmotion { background: #fce7f3; color: #be185d; }
-.areaReading { background: #e0f2fe; color: #0369a1; }
-.areaHabit { background: #fef3c7; color: #92400e; }
+.areaLearning { background: #e8eff0; color: #496c78; }
+.areaPhysical { background: #edf2e5; color: #58754b; }
+.areaCreative { background: #f0eaf1; color: #775e83; }
+.areaSocial { background: #f7ede2; color: #ac4826; }
+.areaEmotion { background: #f4e8e9; color: #985363; }
+.areaReading { background: #e8eff0; color: #496c78; }
+.areaHabit { background: #f8edcf; color: #8d692b; }
 .areaOther { background: var(--bg-muted); color: var(--text-secondary); }
 
 .analysisPanel {
@@ -321,6 +358,35 @@
   gap: var(--space-2);
 }
 
+.statusGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.statusBtn {
+  display: grid;
+  gap: 3px;
+  min-height: 64px;
+  padding: var(--space-3);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.statusBtn span {
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.statusBtnActive {
+  border-color: var(--brand-primary);
+  background: var(--brand-primary-light);
+  color: var(--brand-primary-dark);
+}
+
 .optionBtn {
   min-height: 40px;
   padding: 0 var(--space-3);
@@ -376,5 +442,14 @@
 
   .optionGrid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .activityCard {
+    align-items: flex-start;
+  }
+
+  .startDateBadge {
+    white-space: normal;
+    text-align: right;
   }
 }

@@ -8,11 +8,11 @@
   font-weight: 500;
 }
 
-.health { background: #ECFDF5; color: #059669; }
-.meal { background: #FEF3C7; color: #B45309; }
-.learning { background: #DBEAFE; color: #2563EB; }
-.play { background: #EDE9FE; color: #7C3AED; }
-.emotion { background: #FCE7F3; color: #DB2777; }
-.reading { background: #FFF7ED; color: #EA580C; }
-.milestone { background: #FEF2F2; color: #DC2626; }
-.default { background: #F3F4F6; color: #4B5563; }
+.health { background: #EDF2E5; color: #58754B; }
+.meal { background: #F8EDCF; color: #8D692B; }
+.learning { background: #E8EFF0; color: #496C78; }
+.play { background: #F0EAF1; color: #775E83; }
+.emotion { background: #F4E8E9; color: #985363; }
+.reading { background: #F7EDE2; color: #AC4826; }
+.milestone { background: #FBECE5; color: #B34731; }
+.default { background: #F1EEE5; color: #505449; }

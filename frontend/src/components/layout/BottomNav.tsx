@@ -24,9 +24,9 @@ export default function BottomNav() {
         {tabs.map((tab) => {
           const isActive = pathname.startsWith(tab.href);
           const Icon = tab.icon;
-          const color = isActive ? tab.color : "#9CA3AF";
+          const color = isActive ? "var(--brand-primary)" : "var(--text-tertiary)";
           return (
-            <Link key={tab.href} href={tab.href} className={styles.tab}>
+            <Link key={tab.href} href={tab.href} className={`${styles.tab} ${isActive ? styles.active : ""}`} aria-current={isActive ? "page" : undefined}>
               <Icon size={24} strokeWidth={isActive ? 2.5 : 1.5} style={{ color }} />
               <span
                 className={[styles.tabLabel, isActive ? styles.tabLabelActive : ""].join(" ")}

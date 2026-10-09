@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import AppHeader from "@/components/layout/AppHeader";
+import PageIntro from "@/components/layout/PageIntro";
 import styles from "./page.module.css";
 
 const games = [
@@ -18,11 +19,9 @@ const games = [
 export default function PlayPage() {
   return (
     <>
-      <AppHeader title="Play" />
+      <AppHeader title="놀이" />
       <div className={styles.page}>
-        <h3 className="text-h3" style={{ marginBottom: "var(--space-4)" }}>
-          🎮 어떤 놀이 할까?
-        </h3>
+        <PageIntro eyebrow="PLAY & DISCOVER" title="놀이 속에서 한 뼘 더" description="생각하고, 발견하고, 함께 웃어요. 오늘은 어떤 놀이를 해볼까요?" />
         <div className={styles.grid}>
           {games.map((g) => {
             const card = (
@@ -37,8 +36,9 @@ export default function PlayPage() {
                 {card}
               </Link>
             ) : (
-              <div key={g.name} className={styles.gameCard}>
+              <div key={g.name} className={`${styles.gameCard} ${styles.comingSoon}`}>
                 {card}
+                <span className={styles.badge}>준비 중</span>
               </div>
             );
           })}

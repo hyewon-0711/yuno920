@@ -7,6 +7,7 @@ import { useChild } from "@/hooks/useChild";
 import { useSchedules } from "@/hooks/useSchedules";
 import { useReadingToday } from "@/hooks/useReadingToday";
 import AppHeader from "@/components/layout/AppHeader";
+import PageIntro from "@/components/layout/PageIntro";
 import WeatherSection from "./components/WeatherSection";
 import ScheduleSection from "./components/ScheduleSection";
 import WeeklyTimetableSection from "./components/WeeklyTimetableSection";
@@ -43,7 +44,7 @@ export default function DashboardPage() {
   if (authLoading || childLoading) {
     return (
       <>
-        <AppHeader title="Home" />
+        <AppHeader title="우리 아이의 하루" />
         <div className={styles.page}>
           <p style={{ textAlign: "center", color: "var(--text-tertiary)" }}>불러오는 중...</p>
         </div>
@@ -55,16 +56,9 @@ export default function DashboardPage() {
 
   return (
     <>
-      <AppHeader title="Home" />
+      <AppHeader title="우리 아이의 하루" />
       <div className={styles.page}>
-        <section className={styles.greeting}>
-          <h2 className="text-h1">
-            {child.name}의 하루 💪
-          </h2>
-          <p className="text-body-sm" style={{ color: "var(--text-tertiary)" }}>
-            오늘 하루를 기록하고 확인하세요
-          </p>
-        </section>
+        <PageIntro eyebrow="LITTLE MOMENTS, BIG GROWTH" title={`${child.name}의 오늘도, 함께`} description="함께한 시간과 작은 성장을 모아, 우리 아이만의 하루를 만들어가요." />
 
         <ScheduleSection
           schedules={schedules}

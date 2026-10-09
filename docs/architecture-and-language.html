@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yuno920 Architecture and Language Inventory</title>
+  <style>
+    :root {
+      --bg: #f7f8fa;
+      --paper: #ffffff;
+      --text: #1f2933;
+      --muted: #5f6c7b;
+      --line: #d9e2ec;
+      --accent: #2563eb;
+      --accent-soft: #e8f0ff;
+      --code-bg: #111827;
+      --code-text: #e5e7eb;
+      --table-head: #f1f5f9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      line-height: 1.68;
+    }
+
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 24px 72px;
+    }
+
+    .document {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 42px 48px 32px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    header p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #0f172a;
+      font-size: 34px;
+      line-height: 1.24;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 42px 0 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+      color: #111827;
+      font-size: 22px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 28px 0 12px;
+      color: #1e293b;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    main {
+      padding: 8px 48px 48px;
+    }
+
+    p {
+      margin: 0 0 14px;
+    }
+
+    ul,
+    ol {
+      margin: 8px 0 18px;
+      padding-left: 24px;
+    }
+
+    li {
+      margin: 5px 0;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #eef2f7;
+      color: #111827;
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      margin: 16px 0 22px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      border-radius: 8px;
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    pre code {
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    table {
+      width: 100%;
+      margin: 16px 0 24px;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--table-head);
+      color: #111827;
+      font-weight: 700;
+    }
+
+    .callout {
+      margin: 18px 0 24px;
+      padding: 16px 18px;
+      border-left: 4px solid var(--accent);
+      border-radius: 6px;
+      background: var(--accent-soft);
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border: 1px solid #c7d2fe;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #1e40af;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    @media (max-width: 760px) {
+      .page {
+        padding: 20px 12px 40px;
+      }
+
+      header,
+      main {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <article class="document">
+      <header>
+        <h1>Yuno920 Architecture and Language Inventory</h1>
+        <p>작성일: 2026-07-15</p>
+        <div class="meta">
+          <span class="pill">Next.js</span>
+          <span class="pill">FastAPI</span>
+          <span class="pill">Supabase</span>
+          <span class="pill">OpenAI API</span>
+          <span class="pill">Vercel / Render</span>
+        </div>
+      </header>
+
+      <main>
+        <h2>1. 요약</h2>
+        <p>Yuno920은 아동 성장, 기록, 독서, 일정, 놀이, AI 코칭을 제공하는 웹 애플리케이션이다. 저장소는 <code>frontend</code>, <code>backend</code>, <code>supabase</code>로 분리되어 있으며, 프론트엔드는 Next.js 기반 SPA/SSR 애플리케이션, 백엔드는 FastAPI 기반 API 서버, 데이터베이스와 인증은 Supabase가 담당한다.</p>
+
+        <h2>2. 전체 아키텍처</h2>
+        <pre><code>사용자 브라우저
+  |
+  | HTTPS
+  v
+Next.js Frontend (Vercel)
+  |                         |
+  | Supabase JS SDK          | fetch + Bearer access_token
+  v                         v
+Supabase Auth/DB/Storage   FastAPI Backend (Render)
+                            |
+                            | service role / API key
+                            v
+                     Supabase DB + OpenAI API + 외부 공공 API</code></pre>
+
+        <ol>
+          <li>사용자는 Next.js 프론트엔드에 접속한다.</li>
+          <li>로그인, 회원가입, OAuth, 세션 관리는 Supabase Auth와 <code>@supabase/supabase-js</code>가 처리한다.</li>
+          <li>일반 데이터 CRUD는 프론트엔드가 Supabase DB에 직접 접근한다. 접근 제어는 Supabase RLS 정책으로 보호한다.</li>
+          <li>AI 분석, 코칭, 퀴즈 생성처럼 서버 키나 OpenAI API가 필요한 기능은 FastAPI 백엔드로 요청한다.</li>
+          <li>프론트엔드는 Supabase access token을 <code>Authorization: Bearer ...</code>로 백엔드에 전달한다.</li>
+          <li>백엔드는 JWT를 검증하고, Supabase service role key로 데이터 조회/저장 후 OpenAI API 또는 외부 API를 호출한다.</li>
+        </ol>
+
+        <h2>3. 구성 언어 및 기술 스택</h2>
+        <table>
+          <thead>
+            <tr><th>영역</th><th>언어</th><th>주요 기술</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Frontend</td><td>TypeScript, TSX, CSS</td><td>Next.js 16 App Router, React 19, CSS Modules, Recharts, lucide-react</td></tr>
+            <tr><td>Backend</td><td>Python</td><td>FastAPI, Uvicorn, Pydantic Settings, httpx, PyJWT</td></tr>
+            <tr><td>Database</td><td>SQL / PLpgSQL</td><td>Supabase PostgreSQL, RLS, trigger, function, enum, storage bucket</td></tr>
+            <tr><td>AI 연동</td><td>Python</td><td>OpenAI Python SDK, <code>gpt-4o-mini</code></td></tr>
+            <tr><td>Infra/Deploy</td><td>YAML, Dockerfile</td><td>Vercel, Render, Docker</td></tr>
+            <tr><td>Package management</td><td>npm, pip</td><td><code>package-lock.json</code>, <code>requirements.txt</code></td></tr>
+          </tbody>
+        </table>
+
+        <h2>4. 저장소 구조</h2>
+        <pre><code>yuno920/
+  frontend/      Next.js 프론트엔드 애플리케이션
+  backend/       FastAPI 백엔드 API 서버
+  supabase/      DB 마이그레이션 및 seed SQL
+  docs/          기획, 설계, API, DB, 기능 문서
+  README.md      프로젝트 개요 및 실행 방법</code></pre>
+
+        <h2>5. Frontend Architecture</h2>
+        <p>프론트엔드는 <code>frontend/src/app</code> 아래의 Next.js App Router 구조를 사용한다.</p>
+
+        <table>
+          <thead>
+            <tr><th>경로</th><th>역할</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>/</code></td><td>랜딩 또는 진입 페이지</td></tr>
+            <tr><td><code>/auth/login</code>, <code>/auth/signup</code>, <code>/auth/callback</code></td><td>인증 화면 및 OAuth callback</td></tr>
+            <tr><td><code>/onboarding</code></td><td>최초 아동 프로필 등록</td></tr>
+            <tr><td><code>/dashboard</code></td><td>대시보드, 날씨, 일정, 독서, 코칭</td></tr>
+            <tr><td><code>/records</code></td><td>생활 기록, 상세, 신규 작성, 독서/마일스톤 기록</td></tr>
+            <tr><td><code>/growth</code></td><td>성장 지표, 독서 성장, 육각형 역량, 성장 조언</td></tr>
+            <tr><td><code>/insight</code></td><td>일일 요약, 주간/월간 리포트, 부모 트렌드</td></tr>
+            <tr><td><code>/activities</code></td><td>활동 구성 및 AI 활동 분석</td></tr>
+            <tr><td><code>/chat</code></td><td>아동 데이터 기반 AI 챗봇</td></tr>
+            <tr><td><code>/play</code></td><td>기억력, 퀴즈, 바둑, 계산, 마인크래프트 관련 놀이</td></tr>
+            <tr><td><code>/settings</code></td><td>가족 구성원, 알림 등 설정</td></tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr><th>계층</th><th>위치</th><th>역할</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Route/Page</td><td><code>frontend/src/app/**/page.tsx</code></td><td>화면 단위 진입점</td></tr>
+            <tr><td>Layout</td><td><code>frontend/src/app/layout.tsx</code>, <code>(app)/layout.tsx</code></td><td>전역 및 인증 후 앱 레이아웃</td></tr>
+            <tr><td>Components</td><td><code>frontend/src/components</code></td><td>UI 컴포넌트, 레이아웃, 부모 관심사 컴포넌트</td></tr>
+            <tr><td>Hooks</td><td><code>frontend/src/hooks</code></td><td>Supabase 데이터 조회/변경 로직</td></tr>
+            <tr><td>Context</td><td><code>frontend/src/contexts/AuthContext.tsx</code></td><td>인증 상태 관리</td></tr>
+            <tr><td>Lib</td><td><code>frontend/src/lib</code></td><td>Supabase client, API wrapper, auth helper</td></tr>
+          </tbody>
+        </table>
+
+        <h3>프론트엔드 데이터 접근 방식</h3>
+        <ol>
+          <li>Supabase 직접 접근: <code>supabase.from("records")</code>, <code>supabase.from("growth_metrics")</code> 등으로 DB에 직접 CRUD를 수행한다. RLS 정책이 사용자/아동 권한을 제한한다.</li>
+          <li>FastAPI 경유: <code>postWithAuth()</code>가 Supabase access token을 가져와 백엔드 API에 전달한다. AI, 서버 사이드 검증, 외부 API 통합 기능에 사용된다.</li>
+        </ol>
+
+        <h2>6. Backend Architecture</h2>
+        <p>백엔드는 <code>backend/app</code> 아래의 FastAPI 애플리케이션이다.</p>
+
+        <pre><code>backend/app/
+  main.py                 FastAPI 앱 생성, CORS, 라우터 등록
+  config.py               환경변수 설정
+  auth_deps.py            Supabase JWT 검증 의존성
+  dates.py                앱 기준 날짜/타임존 유틸
+  routers/
+    ai.py                 AI 요약, 코칭, 리포트, 활동 분석, 태깅
+    external.py           날씨, 급식 외부 API
+    play.py               놀이/퀴즈 생성 API
+  services/
+    openai_service.py     OpenAI API 호출
+    supabase_service.py   Supabase service role 기반 데이터 접근
+  models/
+    schemas.py            Pydantic request/response schema</code></pre>
+
+        <table>
+          <thead>
+            <tr><th>Prefix</th><th>파일</th><th>역할</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>/api/ai</code></td><td><code>routers/ai.py</code></td><td>AI 챗, 일일 요약, 주간/월간 리포트, 코칭, 성격 분석, 육각형 역량, 성장 조언, 자동 태깅, 활동 분석</td></tr>
+            <tr><td><code>/api/external</code></td><td><code>routers/external.py</code></td><td>Open-Meteo 날씨, NEIS 급식 정보</td></tr>
+            <tr><td><code>/api/play</code></td><td><code>routers/play.py</code></td><td>OpenAI 기반 퀴즈 생성</td></tr>
+            <tr><td><code>/health</code>, <code>/healthz</code></td><td><code>main.py</code></td><td>헬스 체크</td></tr>
+          </tbody>
+        </table>
+
+        <h3>백엔드 인증 흐름</h3>
+        <ol>
+          <li>프론트엔드가 Supabase access token을 백엔드에 전달한다.</li>
+          <li><code>auth_deps.get_current_user_id()</code>가 <code>SUPABASE_JWT_SECRET</code>로 JWT를 검증한다.</li>
+          <li>JWT 검증 실패 시 Supabase Auth <code>/auth/v1/user</code>를 통한 fallback 검증을 시도한다.</li>
+          <li>아동 데이터 접근이 필요한 API는 <code>SupabaseService.user_has_child_access()</code>로 <code>children</code> 소유자 또는 <code>family_members</code> 접근 권한을 확인한다.</li>
+        </ol>
+
+        <h2>7. Database Architecture</h2>
+        <p>데이터베이스는 Supabase PostgreSQL이다. <code>supabase/migrations</code>에 SQL 마이그레이션이 관리된다.</p>
+
+        <table>
+          <thead>
+            <tr><th>테이블</th><th>역할</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><code>users</code></td><td>Supabase <code>auth.users</code> 확장 프로필</td></tr>
+            <tr><td><code>children</code></td><td>아동 프로필</td></tr>
+            <tr><td><code>family_members</code></td><td>아동별 가족 권한, <code>admin/editor/viewer</code></td></tr>
+            <tr><td><code>schedules</code></td><td>일정</td></tr>
+            <tr><td><code>weekly_timetable</code></td><td>반복되는 주간 시간표</td></tr>
+            <tr><td><code>records</code></td><td>일상 기록</td></tr>
+            <tr><td><code>milestones</code></td><td>발달/성장 마일스톤</td></tr>
+            <tr><td><code>reading_logs</code></td><td>독서 기록</td></tr>
+            <tr><td><code>growth_metrics</code></td><td>키, 몸무게, SR 점수</td></tr>
+            <tr><td><code>hexagon_scores</code></td><td>학습, 신체, 사회성, 감정, 창의성, 습관 역량 점수</td></tr>
+            <tr><td><code>play_logs</code></td><td>놀이 기록</td></tr>
+            <tr><td><code>ai_reports</code></td><td>AI 리포트 저장</td></tr>
+            <tr><td><code>notifications</code></td><td>알림 설정</td></tr>
+            <tr><td><code>child_activities</code></td><td>활동 구성</td></tr>
+            <tr><td><code>activity_assessments</code></td><td>AI 활동 분석 결과</td></tr>
+          </tbody>
+        </table>
+
+        <h3>보안 모델</h3>
+        <ul>
+          <li>Supabase Auth가 사용자 인증을 담당한다.</li>
+          <li>대부분의 테이블에 RLS가 활성화되어 있다.</li>
+          <li><code>has_child_access</code>, <code>has_child_write_access</code>, <code>is_child_owner</code> 같은 DB 함수로 아동별 접근 권한을 제한한다.</li>
+          <li>백엔드는 service role key를 사용하므로, API 레이어에서 JWT 검증과 child access 검증을 수행한다.</li>
+          <li>Storage bucket은 <code>avatars</code>, <code>record-photos</code>, <code>milestone-photos</code>로 분리되어 있다.</li>
+        </ul>
+
+        <h2>8. AI / External Integration</h2>
+        <p>AI 기능은 백엔드의 <code>OpenAIService</code>로 집중되어 있다.</p>
+
+        <table>
+          <thead>
+            <tr><th>기능</th><th>백엔드 endpoint</th><th>설명</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>기본 챗</td><td><code>POST /api/ai/chat</code></td><td>단순 메시지 응답</td></tr>
+            <tr><td>데이터 기반 챗</td><td><code>POST /api/ai/chat-assistant</code></td><td>일정, 기록, 독서, 시간표 context 기반 응답</td></tr>
+            <tr><td>일일 요약</td><td><code>POST /api/ai/daily-summary</code></td><td>당일 기록/독서 기반 요약</td></tr>
+            <tr><td>주간/월간 리포트</td><td><code>POST /api/ai/weekly-report</code>, <code>/monthly-report</code></td><td>기간별 AI 리포트</td></tr>
+            <tr><td>코칭</td><td><code>POST /api/ai/coaching</code></td><td>오늘 일정과 최근 기록 기반 코칭</td></tr>
+            <tr><td>육각형 역량</td><td><code>POST /api/ai/hexagon/calculate</code></td><td>성장/기록/독서 기반 역량 점수 산출</td></tr>
+            <tr><td>성장 조언</td><td><code>POST /api/ai/growth-advice</code></td><td>약점 영역 기반 조언</td></tr>
+            <tr><td>자동 태깅</td><td><code>POST /api/ai/auto-tag</code></td><td>기록 내용 카테고리 자동 분류</td></tr>
+            <tr><td>활동 분석</td><td><code>POST /api/ai/activity-assessment</code></td><td>현재 활동 구성의 균형/부하 분석</td></tr>
+            <tr><td>퀴즈 생성</td><td><code>POST /api/play/generate-quiz</code></td><td>선택 카테고리 기반 객관식 퀴즈 생성</td></tr>
+          </tbody>
+        </table>
+
+        <table>
+          <thead>
+            <tr><th>기능</th><th>API</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>날씨</td><td>Open-Meteo forecast API</td></tr>
+            <tr><td>급식</td><td>NEIS 급식 정보 API</td></tr>
+          </tbody>
+        </table>
+
+        <h2>9. Deployment Architecture</h2>
+        <h3>프론트엔드</h3>
+        <ul>
+          <li>Next.js 애플리케이션</li>
+          <li>Vercel 배포 전제</li>
+          <li><code>.vercel</code> 디렉터리와 Next.js build script 존재</li>
+          <li>주요 환경변수: <code>NEXT_PUBLIC_SUPABASE_URL</code>, <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>, <code>NEXT_PUBLIC_API_URL</code></li>
+        </ul>
+
+        <h3>백엔드</h3>
+        <ul>
+          <li>FastAPI 애플리케이션</li>
+          <li>Render 배포 설정 존재: <code>backend/render.yaml</code></li>
+          <li>Dockerfile 존재: Python 3.12 slim 기반, Uvicorn으로 <code>app.main:app</code> 실행</li>
+          <li>주요 환경변수: <code>OPENAI_API_KEY</code>, <code>SUPABASE_URL</code>, <code>SUPABASE_SERVICE_ROLE_KEY</code>, <code>SUPABASE_JWT_SECRET</code>, <code>APP_TIMEZONE</code></li>
+        </ul>
+
+        <h2>10. Runtime Request Flow Examples</h2>
+        <h3>AI 코칭 요청</h3>
+        <pre><code>Dashboard/Growth/Insight 화면
+  -> postWithAuth("/api/ai/coaching", { child_id })
+  -> Supabase session에서 access_token 획득
+  -> FastAPI Authorization Bearer token 검증
+  -> SupabaseService로 child 접근 권한 확인
+  -> 최근 일정/기록/독서 조회
+  -> OpenAIService.generate_coaching()
+  -> JSON 응답 반환</code></pre>
+
+        <h3>기록 저장 및 자동 태깅</h3>
+        <pre><code>Records 신규 작성 화면
+  -> Supabase Storage에 사진 업로드
+  -> Supabase records 테이블 insert
+  -> postWithAuth("/api/ai/auto-tag", { record_id, content })
+  -> 백엔드가 record child_id와 접근 권한 확인
+  -> OpenAI로 카테고리 추출
+  -> records.categories 업데이트</code></pre>
+
+        <h3>일반 성장 지표 조회/수정</h3>
+        <pre><code>Growth 화면
+  -> useGrowthMetrics hook
+  -> Supabase JS SDK로 growth_metrics 직접 조회/insert/update/delete
+  -> Supabase RLS가 child 접근 권한 적용</code></pre>
+
+        <h2>11. 주요 아키텍처 특징</h2>
+        <ul>
+          <li>프론트엔드와 백엔드가 명확히 분리된 웹 애플리케이션 구조다.</li>
+          <li>데이터 CRUD의 상당 부분은 Supabase client 직접 접근으로 처리하고, AI/서버 키가 필요한 기능만 FastAPI로 위임한다.</li>
+          <li>인증은 Supabase Auth 중심이며, 백엔드는 Supabase JWT를 검증하는 resource server 역할을 한다.</li>
+          <li>권한 모델은 아동 단위 child access를 기준으로 설계되어 있다.</li>
+          <li>PostgreSQL RLS와 FastAPI access check를 함께 사용한다.</li>
+          <li>AI prompt와 OpenAI 호출은 <code>OpenAIService</code>에 모여 있으나, 일부 prompt 구성은 라우터에도 존재한다.</li>
+          <li>CSS는 Tailwind가 README에 언급되어 있으나, 현재 소스 구조상 CSS Modules와 전역 CSS 사용 비중이 높다.</li>
+        </ul>
+
+        <h2>12. 확인된 리스크 및 개선 포인트</h2>
+        <table>
+          <thead>
+            <tr><th>항목</th><th>내용</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>문자 인코딩</td><td>일부 Python 파일과 README의 한글 주석/문구가 깨져 보인다. 소스 인코딩 표준화가 필요하다.</td></tr>
+            <tr><td>API 책임 분리</td><td>라우터에 prompt 생성 로직이 일부 포함되어 있어, AI domain service로 더 분리할 수 있다.</td></tr>
+            <tr><td>데이터 접근 방식 혼합</td><td>프론트 직접 Supabase 접근과 백엔드 접근이 혼재한다. 기능별 기준을 문서화하면 유지보수성이 좋아진다.</td></tr>
+            <tr><td>테스트</td><td>백엔드는 OpenAI key 테스트 파일 외 자동화 테스트가 제한적으로 보인다. 핵심 권한/AI endpoint 테스트 보강이 필요하다.</td></tr>
+            <tr><td>배포 문서</td><td>README에는 backend 배포가 TBD로 남아 있으나 <code>render.yaml</code>은 존재한다. README 업데이트가 필요하다.</td></tr>
+          </tbody>
+        </table>
+
+        <h2>13. 결론</h2>
+        <div class="callout">
+          Yuno920은 TypeScript/Next.js 프론트엔드, Python/FastAPI 백엔드, Supabase PostgreSQL/Auth/Storage를 중심으로 구성된 풀스택 웹 애플리케이션이다. 아키텍처는 Supabase를 인증과 데이터 플랫폼으로 사용하고, FastAPI를 AI 및 외부 연동을 위한 보안 API 계층으로 두는 형태다. 배포는 프론트엔드 Vercel, 백엔드 Render 구성이 현재 저장소 기준의 실제 구조와 가장 일치한다.
+        </div>
+      </main>
+    </article>
+  </div>
+</body>
+</html>

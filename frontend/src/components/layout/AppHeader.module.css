@@ -6,7 +6,8 @@
   align-items: center;
   height: var(--header-height);
   padding: 0 var(--page-padding);
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(251, 248, 242, 0.94);
+  border-bottom: 1px solid var(--border-default);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -18,14 +19,17 @@
 }
 
 .backBtn {
-  padding: 4px;
+  padding: 10px;
+  display: flex;
+  border-radius: 12px;
   color: var(--text-secondary);
 }
 
 .title {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
+  letter-spacing: -0.6px;
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -34,16 +38,18 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  width: 40px;
+  min-width: 40px;
+  flex-shrink: 0;
 }
 
 @media (min-width: 768px) {
   .title {
     text-align: left;
-    font-size: 20px;
+    font-size: 23px;
   }
 
   .left {
-    display: none;
+    width: auto;
+    margin-right: 12px;
   }
 }

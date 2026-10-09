@@ -1,23 +1,24 @@
 .shell {
-  min-height: 100vh;
+  min-height: 100svh;
   background: var(--bg-default);
 }
 
 .main {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding-bottom: calc(var(--nav-height) + 16px);
+  padding-bottom: calc(var(--nav-height) + 24px + env(safe-area-inset-bottom));
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
   .shell {
-    display: flex;
+    padding-left: var(--sidebar-width);
   }
 
   .main {
-    margin-left: var(--sidebar-width);
+    margin: 0 auto;
     max-width: var(--content-max-width);
-    width: calc(100% - var(--sidebar-width));
-    padding-bottom: 0;
+    width: 100%;
+    padding-bottom: 40px;
   }
 }

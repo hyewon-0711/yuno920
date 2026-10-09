@@ -63,7 +63,7 @@
   font-size: 14px;
   color: var(--text-tertiary);
   text-align: center;
-  padding: var(--space-5);
+  padding: var(--page-padding);
 }
 
 .hintWrap {

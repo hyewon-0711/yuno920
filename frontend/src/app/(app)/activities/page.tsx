@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Activity, BarChart3, Brain, Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Activity, BarChart3, Brain, CalendarClock, Plus, RefreshCw, Trash2 } from "lucide-react";
 import AppHeader from "@/components/layout/AppHeader";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -60,7 +60,12 @@ const areaClass: Record<string, string> = {
 };
 
 function emptyInput(): ActivityInput {
-  return { title: "", area: "learning", frequency: "weekly_1" };
+  return { title: "", area: "learning", frequency: "weekly_1", status: "active", start_date: null };
+}
+
+function formatStartDate(value: string) {
+  const [year, month, day] = value.split("-");
+  return `${year}년 ${Number(month)}월 ${Number(day)}일 시작`;
 }
 
 export default function ActivitiesPage() {
@@ -70,6 +75,7 @@ export default function ActivitiesPage() {
   const { child, loading: childLoading } = useChild();
   const {
     activities,
+    plannedActivities,
     latestAssessment,
     isAssessmentStale,
     loading,
@@ -123,12 +129,21 @@ export default function ActivitiesPage() {
     setShowForm(true);
   };
 
+  const openPlannedCreate = () => {
+    setEditing(null);
+    setForm({ ...emptyInput(), status: "planned" });
+    setFormError("");
+    setShowForm(true);
+  };
+
   const openEdit = (activity: ChildActivity) => {
     setEditing(activity);
     setForm({
       title: activity.title,
       area: activity.area,
       frequency: activity.frequency,
+      status: activity.status === "planned" ? "planned" : "active",
+      start_date: activity.start_date,
     });
     setFormError("");
     setShowForm(true);
@@ -147,12 +162,20 @@ export default function ActivitiesPage() {
       setFormError("활동명을 입력해주세요.");
       return;
     }
+    if (form.status === "planned" && !form.start_date) {
+      setFormError("진행 예정 활동의 시작 예정일을 선택해주세요.");
+      return;
+    }
 
     setSaving(true);
     setFormError("");
 
     try {
-      const payload = { ...form, title: form.title.trim() };
+      const payload = {
+        ...form,
+        title: form.title.trim(),
+        start_date: form.status === "planned" ? form.start_date : null,
+      };
       if (editing) await updateActivity(editing.id, payload);
       else await addActivity(payload);
       closeForm(true);
@@ -221,6 +244,7 @@ export default function ActivitiesPage() {
             <h2>{summary || "활동을 추가하고 균형을 확인해보세요"}</h2>
             <div className={styles.heroChips}>
               <span>{activities.length}개 활동</span>
+              {plannedActivities.length > 0 && <span>예정 {plannedActivities.length}개</span>}
               <span>부담도 {loadLevel}</span>
               <span>{latestAssessment ? (isAssessmentStale ? "재분석 필요" : `${score}점`) : "분석 전"}</span>
             </div>
@@ -262,6 +286,46 @@ export default function ActivitiesPage() {
                   </div>
                   <span className={`${styles.areaBadge} ${areaClass[activity.area] || styles.areaOther}`}>
                     {getActivityAreaLabel(activity.area)}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className={styles.section}>
+          <div className={styles.sectionHead}>
+            <div>
+              <p className={styles.eyebrow}>앞으로 시작할 일정</p>
+              <h3>진행 예정 활동</h3>
+            </div>
+            <button type="button" className={styles.textBtn} onClick={openPlannedCreate}>
+              예정 활동 추가
+            </button>
+          </div>
+
+          {loading ? (
+            <p className={styles.muted}>예정 활동을 불러오는 중...</p>
+          ) : plannedActivities.length === 0 ? (
+            <div className={styles.plannedEmpty}>
+              <CalendarClock size={24} />
+              <div>
+                <strong>아직 예정된 활동이 없어요</strong>
+                <p>새로 시작할 학원이나 활동을 미리 등록해둘 수 있어요.</p>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.activityList}>
+              {plannedActivities.map((activity) => (
+                <button key={activity.id} type="button" className={`${styles.activityCard} ${styles.plannedCard}`} onClick={() => openEdit(activity)}>
+                  <div>
+                    <div className={styles.activityTitle}>{activity.title}</div>
+                    <div className={styles.activityMeta}>
+                      {getActivityAreaLabel(activity.area)} · {getActivityFrequencyLabel(activity.frequency)}
+                    </div>
+                  </div>
+                  <span className={styles.startDateBadge}>
+                    {activity.start_date ? formatStartDate(activity.start_date) : "시작일 미정"}
                   </span>
                 </button>
               ))}
@@ -359,6 +423,37 @@ export default function ActivitiesPage() {
               value={form.title}
               onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
             />
+
+            <div>
+              <p className={styles.fieldLabel}>진행 상태</p>
+              <div className={styles.statusGrid}>
+                <button
+                  type="button"
+                  className={`${styles.statusBtn} ${form.status === "active" ? styles.statusBtnActive : ""}`}
+                  onClick={() => setForm((prev) => ({ ...prev, status: "active", start_date: null }))}
+                >
+                  <strong>진행 중</strong>
+                  <span>현재 하고 있는 활동</span>
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.statusBtn} ${form.status === "planned" ? styles.statusBtnActive : ""}`}
+                  onClick={() => setForm((prev) => ({ ...prev, status: "planned" }))}
+                >
+                  <strong>진행 예정</strong>
+                  <span>앞으로 시작할 활동</span>
+                </button>
+              </div>
+            </div>
+
+            {form.status === "planned" && (
+              <Input
+                label="시작 예정일"
+                type="date"
+                value={form.start_date || ""}
+                onChange={(event) => setForm((prev) => ({ ...prev, start_date: event.target.value || null }))}
+              />
+            )}
 
             <div>
               <p className={styles.fieldLabel}>영역</p>

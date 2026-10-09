@@ -1,5 +1,5 @@
 .page {
-  padding: var(--space-5);
+  padding: var(--page-padding);
 }
 
 .grid {
@@ -10,6 +10,7 @@
 
 .gameCard {
   background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-5) var(--space-4);
   box-shadow: var(--shadow-sm);
@@ -24,6 +25,9 @@
 .gameCard:hover { box-shadow: var(--shadow-md); }
 .gameCard:active { transform: scale(0.97); }
 
-.gameIcon { font-size: 40px; }
+.gameIcon { font-size: 34px; display: grid; place-items: center; width: 70px; height: 70px; border-radius: 22px; background: var(--surface-primary); margin-bottom: 10px; }
 .gameName { font-size: 16px; font-weight: 500; }
-.gameDesc { font-size: 12px; color: var(--text-tertiary); }
+.gameDesc { font-size: 12px; color: var(--text-tertiary); text-align: center; line-height: 1.7; }
+.comingSoon { opacity: .65; cursor: default; }
+.badge { font-size: 10px; color: var(--text-tertiary); border: 1px solid var(--border-default); border-radius: 20px; padding: 3px 8px; }
+@media (min-width: 1000px) { .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }

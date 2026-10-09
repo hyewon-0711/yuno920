@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { getMembership } from "@/lib/membership";
 import InterestChipRow from "@/components/parent/InterestChipRow";
 import AppHeader from "@/components/layout/AppHeader";
+import PageIntro from "@/components/layout/PageIntro";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -15,6 +18,7 @@ import SettingsDataSections from "./SettingsDataSections";
 export default function SettingsPage() {
   const router = useRouter();
   const { signOut } = useAuth();
+  const [operator, setOperator] = useState(false);
   const [interests, setInterests] = useState<ParentInterestId[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -25,6 +29,7 @@ export default function SettingsPage() {
   useEffect(() => {
     let cancel = false;
     (async () => {
+      try { const membership = await getMembership(); if (!cancel) setOperator(membership.is_operator); } catch { /* access gate handles unavailable membership */ }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         if (!cancel) setLoading(false);
@@ -101,6 +106,7 @@ export default function SettingsPage() {
     <>
       <AppHeader title="설정" showBack />
       <div className={styles.page}>
+        <PageIntro eyebrow="OUR FAMILY SPACE" title="우리 가족에게 맞게" description="아이의 프로필과 가족, 관심사를 한곳에서 관리해요." />
         <section className={styles.card}>
           <h2 className={styles.cardTitle}>부모 관심사</h2>
           <p className={styles.cardDesc}>Insight의 데일리 트렌드 뉴스에 반영됩니다. (최대 6개)</p>
@@ -130,6 +136,7 @@ export default function SettingsPage() {
         </section>
 
         <SettingsDataSections />
+        {operator && <section className={styles.card}><h2 className={styles.cardTitle}>운영자 관리</h2><p className={styles.cardDesc}>가입 신청을 확인하고 승인·거절·이용 정지를 관리합니다.</p><Link href="/admin/members" style={{ color: "var(--brand-primary)", fontWeight: 600 }}>가입 승인 관리로 이동 →</Link></section>}
         <Button variant="ghost" fullWidth onClick={handleLogout}>
           로그아웃
         </Button>

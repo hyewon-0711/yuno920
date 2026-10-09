@@ -4,7 +4,7 @@
   flex-direction: column;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: var(--space-5);
+  padding: var(--page-padding);
 }
 
 .header {

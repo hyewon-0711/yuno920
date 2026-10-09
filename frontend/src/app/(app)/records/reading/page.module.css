@@ -1,4 +1,4 @@
-.page { padding: var(--space-5); }
+.page { padding: var(--page-padding); }
 
 .summary {
   display: flex;
@@ -7,7 +7,7 @@
   gap: var(--space-6);
   background: var(--bg-card);
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  padding: var(--page-padding);
   margin-bottom: var(--space-5);
   box-shadow: var(--shadow-sm);
 }
@@ -46,6 +46,7 @@
   display: flex;
   gap: var(--space-3);
   background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   box-shadow: var(--shadow-sm);

@@ -4,7 +4,8 @@
   top: 0;
   left: 0;
   width: var(--sidebar-width);
-  height: 100vh;
+  height: 100svh;
+  overflow-y: auto;
   background: var(--bg-card);
   border-right: 1px solid var(--border-default);
   padding: var(--space-6) var(--space-4);
@@ -23,23 +24,30 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-3);
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-10);
 }
 
 .logoIcon {
-  font-size: 24px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  background: var(--surface-success);
+  color: var(--status-success);
 }
 
 .logoText {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--brand-primary);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text-primary);
 }
 
 .nav {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 7px;
   flex: 1;
 }
 
@@ -63,7 +71,7 @@
 
 .navItemActive {
   background: var(--surface-primary);
-  color: var(--tab-color, var(--brand-primary));
+  color: var(--brand-primary);
   font-weight: 600;
 }
 
@@ -75,3 +83,7 @@
   border-top: 1px solid var(--border-light);
   padding-top: var(--space-4);
 }
+
+.logoText > span { color: var(--brand-primary); }
+.navLabel { padding: 0 12px; margin-bottom: 16px; font-size: 11px; color: var(--text-tertiary); letter-spacing: .5px; }
+.note { padding: 22px 12px 8px; font-size: 11px; color: var(--text-tertiary); line-height: 1.9; }

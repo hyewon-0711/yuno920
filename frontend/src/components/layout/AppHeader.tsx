@@ -27,7 +27,7 @@ export default function AppHeader({ title, showBack, backHref, rightAction }: Ap
     <header className={styles.header}>
       <div className={styles.left}>
         {shouldShowBack && (
-          <button onClick={handleBack} className={styles.backBtn}>
+          <button onClick={handleBack} className={styles.backBtn} aria-label="이전 페이지로">
             <ArrowLeft size={24} />
           </button>
         )}

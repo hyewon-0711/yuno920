@@ -1,4 +1,4 @@
-.page { max-width: 600px; margin: 0 auto; padding: var(--space-5); display: flex; flex-direction: column; gap: 16px; }
+.page { max-width: 600px; margin: 0 auto; padding: var(--page-padding); display: flex; flex-direction: column; gap: 16px; }
 .intro h2 { font-size: 22px; margin-bottom: 8px; }
 .intro p, .note { color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
 .controls { display: flex; flex-wrap: wrap; gap: 8px; }

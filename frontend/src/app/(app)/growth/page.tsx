@@ -8,6 +8,7 @@ import { useGrowthMetrics } from "@/hooks/useGrowthMetrics";
 import { useHexagon } from "@/hooks/useHexagon";
 import { useReadingGrowth } from "@/hooks/useReadingGrowth";
 import AppHeader from "@/components/layout/AppHeader";
+import PageIntro from "@/components/layout/PageIntro";
 import PhysicalGrowthSection from "./components/PhysicalGrowthSection";
 import LearningSection from "./components/LearningSection";
 import HexagonSection from "./components/HexagonSection";
@@ -39,7 +40,7 @@ export default function GrowthPage() {
   if (authLoading || childLoading || !child) {
     return (
       <>
-        <AppHeader title="Growth" />
+        <AppHeader title="성장" />
         <div className={styles.page}>
           <p style={{ textAlign: "center", color: "var(--text-tertiary)", padding: "var(--space-8) 0" }}>
             불러오는 중...
@@ -51,14 +52,9 @@ export default function GrowthPage() {
 
   return (
     <>
-      <AppHeader title="Growth" />
+      <AppHeader title="성장" />
       <div className={styles.page}>
-        <section className={styles.greeting}>
-          <h2 className="text-h1">{child.name}의 성장</h2>
-          <p className="text-body-sm" style={{ color: "var(--text-tertiary)" }}>
-            신체, 학습, 독서 데이터를 추적하고 AI 분석을 받아보세요
-          </p>
-        </section>
+        <PageIntro eyebrow="AT YOUR OWN PACE" title={`${child.name}의 속도로 자라요`} description="신체, 학습, 독서의 변화를 차곡차곡 모아 성장을 함께 살펴봐요." />
 
         {metricsLoadError && (
           <p

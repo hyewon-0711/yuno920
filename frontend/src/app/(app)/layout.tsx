@@ -1,10 +1,11 @@
 import { AuthProvider } from "@/contexts/AuthContext";
 import AppShell from "@/components/layout/AppShell";
+import MembershipGate from "@/components/auth/MembershipGate";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <AppShell>{children}</AppShell>
+      <MembershipGate><AppShell>{children}</AppShell></MembershipGate>
     </AuthProvider>
   );
 }

@@ -5,6 +5,8 @@
   right: 0;
   z-index: var(--z-nav);
   background: var(--bg-card);
+  border-top: 1px solid var(--border-default);
+  padding-bottom: env(safe-area-inset-bottom);
   box-shadow: var(--shadow-nav);
 }
 
@@ -46,3 +48,5 @@
 .tabLabelActive {
   font-weight: 700;
 }
+
+.active svg { background: var(--surface-primary); border-radius: 8px; box-shadow: 0 0 0 5px var(--surface-primary); }

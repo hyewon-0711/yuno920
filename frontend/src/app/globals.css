@@ -10,71 +10,75 @@
 /* ========== Design Tokens ========== */
 :root {
   /* Brand */
-  --brand-primary: #F97316;
-  --brand-primary-light: #FFF7ED;
-  --brand-primary-dark: #EA580C;
-  --brand-primary-active: #C2410C;
+  --brand-primary: #BD4B24;
+  --brand-primary-light: #F7EDE2;
+  --brand-primary-dark: #A93C18;
+  --brand-primary-active: #92391F;
 
   /* Background */
-  --bg-default: #F9FAFB;
-  --bg-card: #FFFFFF;
-  --bg-muted: #F3F4F6;
-  --bg-elevated: #FFFFFF;
+  --bg-default: #FBF8F2;
+  --bg-card: #FFFEFC;
+  --bg-muted: #F1EEE5;
+  --bg-elevated: #FFFEFC;
+  --bg-page: var(--bg-default);
+  --bg-primary: var(--bg-default);
+  --border-color: var(--border-default);
+  --focus-ring: rgba(189, 75, 36, 0.13);
   --bg-overlay: rgba(0, 0, 0, 0.5);
 
   /* Surface */
-  --surface-primary: #FFF7ED;
-  --surface-success: #ECFDF5;
-  --surface-warning: #FFFBEB;
-  --surface-error: #FEF2F2;
-  --surface-info: #EEF2FF;
+  --surface-primary: #F7EDE2;
+  --surface-success: #EDF2E5;
+  --surface-warning: #FCF4DF;
+  --surface-error: #FBECE5;
+  --surface-info: #F0EEE6;
 
   /* Text */
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --text-tertiary: #6B7280;
-  --text-disabled: #9CA3AF;
-  --text-placeholder: #9CA3AF;
+  --text-primary: #34372E;
+  --text-secondary: #505449;
+  --text-tertiary: #74786B;
+  --text-disabled: #878B7D;
+  --text-placeholder: #878B7D;
   --text-inverse: #FFFFFF;
 
   /* Border */
-  --border-default: #E5E7EB;
-  --border-light: #F3F4F6;
-  --border-focus: #F97316;
-  --border-error: #EF4444;
+  --border-default: #E3DFD3;
+  --border-light: #F1EEE5;
+  --border-focus: #BD4B24;
+  --border-error: #B34731;
 
   /* Action */
-  --action-primary: #F97316;
-  --action-primary-hover: #EA580C;
-  --action-primary-active: #C2410C;
-  --action-secondary: #3B82F6;
-  --action-destructive: #EF4444;
-  --action-destructive-hover: #DC2626;
+  --action-primary: #BD4B24;
+  --action-primary-hover: #A93C18;
+  --action-primary-active: #92391F;
+  --action-secondary: #627B86;
+  --action-destructive: #B34731;
+  --action-destructive-hover: #963820;
 
   /* Status */
-  --status-success: #10B981;
-  --status-warning: #F59E0B;
-  --status-error: #EF4444;
-  --status-info: #6366F1;
+  --status-success: #58754B;
+  --status-warning: #A57928;
+  --status-error: #B34731;
+  --status-info: #7C705D;
 
   /* Tab Theme */
-  --tab-home: #F97316;
-  --tab-growth: #10B981;
-  --tab-record: #3B82F6;
-  --tab-play: #8B5CF6;
-  --tab-insight: #6366F1;
+  --tab-home: #BD4B24;
+  --tab-growth: #58754B;
+  --tab-record: #627B86;
+  --tab-play: #887293;
+  --tab-insight: #7C705D;
 
   /* Emotion */
-  --emotion-happy-bg: #FEF3C7;
-  --emotion-happy: #F59E0B;
-  --emotion-neutral-bg: #F3F4F6;
-  --emotion-neutral: #6B7280;
-  --emotion-sad-bg: #DBEAFE;
-  --emotion-sad: #3B82F6;
+  --emotion-happy-bg: #F8EDCF;
+  --emotion-happy: #A57928;
+  --emotion-neutral-bg: #F1EEE5;
+  --emotion-neutral: #74786B;
+  --emotion-sad-bg: #E8EFF0;
+  --emotion-sad: #627B86;
   --emotion-sick-bg: #FEE2E2;
-  --emotion-sick: #EF4444;
-  --emotion-tired-bg: #EDE9FE;
-  --emotion-tired: #8B5CF6;
+  --emotion-sick: #B34731;
+  --emotion-tired-bg: #F0EAF1;
+  --emotion-tired: #887293;
 
   /* Spacing */
   --space-1: 4px;
@@ -88,17 +92,17 @@
   --space-12: 48px;
 
   /* Radius */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
   --radius-xl: 24px;
   --radius-full: 9999px;
 
   /* Shadow */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-nav: 0 -4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 3px 14px rgba(70, 61, 37, 0.035);
+  --shadow-md: 0 8px 24px rgba(70, 61, 37, 0.06);
+  --shadow-lg: 0 14px 40px rgba(70, 61, 37, 0.09);
+  --shadow-nav: 0 -4px 24px rgba(70, 61, 37, 0.04);
 
   /* Transition */
   --transition-fast: 150ms ease;
@@ -112,11 +116,11 @@
   --z-toast: 200;
 
   /* Layout */
-  --max-width: 480px;
-  --content-max-width: 960px;
-  --header-height: 56px;
+  --max-width: 600px;
+  --content-max-width: 1140px;
+  --header-height: 76px;
   --nav-height: 64px;
-  --sidebar-width: 240px;
+  --sidebar-width: 232px;
   --page-padding: 20px;
 }
 

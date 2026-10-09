@@ -75,9 +75,9 @@
 
 .empty {
   background: var(--surface-info);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
+  padding: var(--page-padding);
   font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.55;

@@ -32,7 +32,8 @@ export interface ChildActivity {
   title: string;
   area: ActivityArea;
   frequency: ActivityFrequency;
-  status: "active" | "paused" | "ended";
+  status: "active" | "planned" | "paused" | "ended";
+  start_date: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -41,6 +42,8 @@ export interface ActivityInput {
   title: string;
   area: ActivityArea;
   frequency: ActivityFrequency;
+  status: "active" | "planned";
+  start_date: string | null;
 }
 
 export interface ActivityAssessment {
@@ -73,6 +76,7 @@ export function getActivityFrequencyLabel(value: string) {
 
 export function useActivities(childId: string | undefined) {
   const [activities, setActivities] = useState<ChildActivity[]>([]);
+  const [plannedActivities, setPlannedActivities] = useState<ChildActivity[]>([]);
   const [latestAssessment, setLatestAssessment] = useState<ActivityAssessment | null>(null);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -80,6 +84,7 @@ export function useActivities(childId: string | undefined) {
   const fetchActivities = useCallback(async () => {
     if (!childId) {
       setActivities([]);
+      setPlannedActivities([]);
       setLatestAssessment(null);
       setLoading(false);
       return;
@@ -95,7 +100,8 @@ export function useActivities(childId: string | undefined) {
             .from("child_activities")
             .select("*")
             .eq("child_id", childId)
-            .eq("status", "active")
+            .in("status", ["active", "planned"])
+            .order("start_date", { ascending: true, nullsFirst: false })
             .order("created_at", { ascending: false }),
           supabase
             .from("activity_assessments")
@@ -108,7 +114,9 @@ export function useActivities(childId: string | undefined) {
       if (activityError) throw activityError;
       if (assessmentError) throw assessmentError;
 
-      setActivities((activityData || []) as ChildActivity[]);
+      const loadedActivities = (activityData || []) as ChildActivity[];
+      setActivities(loadedActivities.filter((activity) => activity.status === "active"));
+      setPlannedActivities(loadedActivities.filter((activity) => activity.status === "planned"));
       setLatestAssessment((assessmentData?.[0] as ActivityAssessment | undefined) || null);
     } catch (err) {
       setLoadError(err instanceof Error ? err.message : "활동 정보를 불러오지 못했습니다.");
@@ -126,7 +134,6 @@ export function useActivities(childId: string | undefined) {
     const { error } = await supabase.from("child_activities").insert({
       ...input,
       child_id: childId,
-      status: "active",
     });
     if (error) throw error;
     await fetchActivities();
@@ -159,6 +166,7 @@ export function useActivities(childId: string | undefined) {
 
   return {
     activities,
+    plannedActivities,
     latestAssessment,
     isAssessmentStale,
     loading,

@@ -29,6 +29,7 @@ Yuno920 is a child growth and parenting support app.
 - Use `rg` or `rg --files` for code search.
 - Use `apply_patch` for manual file edits.
 - Do not commit secrets or real environment values.
+- For substantial feature, database, test, review, or LLM changes, use the adapted Harness 100 workflow in `docs/harness-100-codex.md`.
 
 ## Frontend
 
@@ -88,6 +89,21 @@ Backend deployment is described in `backend/render.yaml`.
 - Keep migration names sequential and descriptive.
 - Review row-level security changes carefully.
 - Do not place Supabase service role keys in frontend code.
+- Supabase migration SQL is reviewed in-repo first and then applied manually by the project owner.
+
+## Harness 100 Workflow
+
+Harness 100 is adapted for Codex in this repository; do not copy Claude-specific `.claude/` files into the project.
+
+Use these modes when the request matches:
+
+- Fullstack feature: requirement summary -> architecture/API/DB impact -> frontend/backend implementation -> verification.
+- Database change: data model -> migration SQL -> RLS/security -> performance/index review -> manual-apply notes.
+- Code review: findings first, split by style/security/performance/architecture where useful.
+- Test automation: risk-based strategy -> focused tests -> build/lint/test verification.
+- LLM feature: prompt contract -> backend endpoint -> auth/guardrails -> cost/latency notes -> eval cases.
+
+Write temporary planning artifacts only when useful. If needed, place them under `_workspace/` and do not treat that directory as source code.
 
 ## Deployment
 

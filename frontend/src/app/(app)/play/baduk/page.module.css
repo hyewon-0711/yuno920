@@ -5,11 +5,12 @@
   flex-direction: column;
   align-items: center;
   gap: var(--space-3);
-  background: linear-gradient(180deg, #fffaf0 0%, var(--bg-primary) 55%);
+  background: var(--bg-default);
 }
 
 .statusCard, .captureRow, .actions, .help, .resultCard { width: min(100%, 540px); }
-.statusCard { background: var(--bg-card); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); box-shadow: var(--shadow-sm); }
+.statusCard { background: var(--bg-card);
+  border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: var(--space-3) var(--space-4); box-shadow: var(--shadow-sm); }
 .statusCard p { margin-top: 4px; color: var(--text-secondary); font-size: 14px; }
 .turnRow { display: flex; align-items: center; gap: var(--space-2); font-size: 17px; }
 .turnStone { width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 2px 5px #0005; }
@@ -33,7 +34,7 @@
 .actions button { min-height: 44px; border-radius: var(--radius-lg); font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
 .actions button:disabled { opacity: .45; cursor: default; }
 .secondaryButton { border: 1px solid var(--border-default); color: var(--text-secondary); background: var(--bg-card); }
-.passButton { border: 0; color: white; background: linear-gradient(135deg, #7950c8, var(--tab-play)); }
+.passButton { border: 0; color: white; background: var(--action-primary); }
 .resultCard { padding: var(--space-4); text-align: center; border-radius: var(--radius-xl); background: #fff4cc; border: 2px solid #f1c85b; }
 .resultCard h2 { font-size: 21px; margin: 2px 0 5px; }
 .resultCard p { color: var(--text-secondary); }

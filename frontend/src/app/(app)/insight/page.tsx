@@ -1,6 +1,7 @@
 "use client";
 
 import AppHeader from "@/components/layout/AppHeader";
+import PageIntro from "@/components/layout/PageIntro";
 import DailySummarySection from "./components/DailySummarySection";
 import ParentTrendsSection from "./components/ParentTrendsSection";
 import InsightAiSections from "./components/InsightAiSections";
@@ -9,8 +10,9 @@ import styles from "./page.module.css";
 export default function InsightPage() {
   return (
     <>
-      <AppHeader title="Insight" />
+      <AppHeader title="인사이트" />
       <div className={styles.page}>
+        <PageIntro eyebrow="GROWING TOGETHER" title="기록 속에서 발견하는 가능성" description="아이의 하루를 돌아보고, 우리 가족에게 필요한 이야기를 만나보세요." />
         <section className={styles.section}>
           <h3 className="text-h3">🏷 부모 관심사 · 데일리 트렌드</h3>
           <p className={styles.sectionLead}>

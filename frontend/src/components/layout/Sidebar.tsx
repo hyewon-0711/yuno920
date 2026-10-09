@@ -1,6 +1,8 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getMembership } from "@/lib/membership";
 import Link from "next/link";
 import {
   Activity,
@@ -10,6 +12,8 @@ import {
   Gamepad2,
   Sparkles,
   Settings,
+  Sprout,
+  ShieldCheck,
 } from "lucide-react";
 import styles from "./Sidebar.module.css";
 
@@ -24,13 +28,20 @@ const tabs = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [operator, setOperator] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    getMembership().then(m => { if (!cancelled) setOperator(m.is_operator); }).catch(() => { if (!cancelled) setOperator(false); });
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <aside className={styles.sidebar}>
-      <div className={styles.logo}>
-        <span className={styles.logoIcon}>🌱</span>
-        <span className={styles.logoText}>Yuno920</span>
-      </div>
+      <Link href="/dashboard" className={styles.logo} aria-label="Yuno920 홈">
+        <span className={styles.logoIcon}><Sprout size={22} /></span>
+        <span className={styles.logoText}>yuno<span>920</span></span>
+      </Link>
+      <p className={styles.navLabel}>우리 아이의 하루</p>
 
       <nav className={styles.nav}>
         {tabs.map((tab) => {
@@ -40,8 +51,8 @@ export default function Sidebar() {
             <Link
               key={tab.href}
               href={tab.href}
+              aria-current={isActive ? "page" : undefined}
               className={`${styles.navItem} ${isActive ? styles.navItemActive : ""}`}
-              style={{ "--tab-color": tab.color } as React.CSSProperties}
             >
               <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
               <span>{tab.label}</span>
@@ -51,6 +62,7 @@ export default function Sidebar() {
       </nav>
 
       <div className={styles.bottom}>
+        {operator && <Link href="/admin/members" className={`${styles.navItem} ${pathname.startsWith("/admin") ? styles.navItemActive : ""}`}><ShieldCheck size={20} /><span>가입 승인 관리</span></Link>}
         <Link
           href="/settings"
           className={`${styles.navItem} ${pathname.startsWith("/settings") ? styles.navItemActive : ""}`}
@@ -58,6 +70,7 @@ export default function Sidebar() {
           <Settings size={20} strokeWidth={1.5} />
           <span>설정</span>
         </Link>
+        <p className={styles.note}>작은 오늘이 모여,<br />아이의 내일이 돼요.</p>
       </div>
     </aside>
   );

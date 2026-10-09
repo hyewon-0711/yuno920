@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useChild } from "@/hooks/useChild";
 import AppHeader from "@/components/layout/AppHeader";
+import PageIntro from "@/components/layout/PageIntro";
 import { Tag, EmptyState } from "@/components/ui";
 import styles from "./page.module.css";
 
@@ -63,7 +64,7 @@ export default function RecordsPage() {
   return (
     <>
       <AppHeader
-        title="Record"
+        title="성장 기록"
         rightAction={
           <button
             onClick={() => router.push("/records/new")}
@@ -74,6 +75,7 @@ export default function RecordsPage() {
         }
       />
       <div className={styles.page}>
+        <PageIntro eyebrow="OUR LITTLE MOMENTS" title="잊고 싶지 않은 오늘" description="작은 발견부터 특별한 처음까지, 우리 아이의 이야기를 남겨요." />
         <div className={styles.tabs}>
           <button
             className={`${styles.tab} ${tab === "records" ? styles.tabActive : ""}`}

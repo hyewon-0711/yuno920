@@ -31,7 +31,7 @@ def _validate_with_supabase_auth(token: str, settings: Settings) -> str | None:
         return None
 
 
-def get_current_user_id(
+def get_authenticated_user_id(
     authorization: str | None = Header(None, alias="Authorization"),
     settings: Settings = Depends(get_settings),
 ) -> str:
@@ -81,3 +81,18 @@ def get_current_user_id(
     if not sub or not isinstance(sub, str):
         raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다")
     return sub
+
+
+def get_current_user_id(user_id: str = Depends(get_authenticated_user_id)) -> str:
+    """Require current database approval, including for previously issued JWTs."""
+    from app.services.supabase_service import get_supabase_client
+
+    try:
+        result = get_supabase_client().rpc(
+            "is_user_approved", {"p_user_id": user_id}
+        ).execute()
+    except Exception:
+        raise HTTPException(status_code=503, detail="가입 승인 상태를 확인하지 못했습니다")
+    if result.data is not True:
+        raise HTTPException(status_code=403, detail="운영자 승인이 필요한 계정입니다")
+    return user_id

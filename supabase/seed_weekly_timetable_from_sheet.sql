@@ -1,51 +1,67 @@
--- 주간 시간표 (스프레드시트/캡처 기준) → public.weekly_timetable
--- 1) migrations/003_weekly_timetable.sql 적용 여부 확인
--- 2) 아래 YOUR_CHILD_ID 를 해당 아이 children.id (UUID) 로 교체
--- 3) 이미 같은 child_id 로 넣은 적 있으면 중복 방지를 위해 먼저 DELETE
+-- 윤호 2학년 2학기 시간표 (사용자가 제공한 이미지 기준)
+-- 운영 반영: 프로젝트 소유자가 Supabase SQL Editor에서 수동 실행합니다.
+-- 003_weekly_timetable.sql 적용 후, 아래 YOUR_CHILD_ID를 윤호의 아이 UUID로 교체하세요.
+-- 대상 아이의 주간 시간표 전체를 교체하므로 기존 내용을 먼저 내보내 보관하세요.
+-- 학교 시간과 구몬 종료는 이미지에 명시되지 않아 기존 seed 값을 유지했습니다.
+-- 칸 경계로 읽은 시간은 notes에 표시했습니다. 실행 전에 확인하세요.
+-- 천문대는 월별 반복을 지원하지 않는 현재 표에서 제목으로 4주차임을 표시합니다.
+-- 스키마/RLS/배포 설정 변경 없음. 일회성 schedules와 활동 데이터는 변경하지 않습니다.
 
--- DELETE FROM public.weekly_timetable WHERE child_id = 'YOUR_CHILD_ID'::uuid;
+DO $$
+DECLARE
+  target_child_id uuid := 'YOUR_CHILD_ID'::uuid;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.children WHERE id = target_child_id) THEN
+    RAISE EXCEPTION '대상 아이 UUID를 확인하세요.';
+  END IF;
 
--- 요일: 0=월, 1=화, 2=수, 3=목, 4=금, 5=토, 6=일
+  -- 삭제와 입력은 하나의 원자적 작업: 입력 실패 시 삭제도 취소됩니다.
+  DELETE FROM public.weekly_timetable WHERE child_id = target_child_id;
 
-INSERT INTO public.weekly_timetable (child_id, day_of_week, start_time, end_time, title, category, notes, color, sort_order)
-VALUES
-  -- ========== 월요일 (0) ==========
-  ('YOUR_CHILD_ID'::uuid, 0, '09:00:00', '13:00:00', '학교', 'school', NULL, '#6B7280', 0),
-  ('YOUR_CHILD_ID'::uuid, 0, '13:40:00', '15:00:00', '방과후 · 스마트레고블록A', 'afterschool', '13:40–15:00 / 스마트레고블록A (과학실2)', '#10B981', 1),
-  ('YOUR_CHILD_ID'::uuid, 0, '15:15:00', '16:00:00', '구몬', 'academy', '15:15 시작', '#3B82F6', 2),
-  ('YOUR_CHILD_ID'::uuid, 0, '16:20:00', '18:25:00', '폴리 셔틀', 'activity', '셔틀 16:20 · 수업 16:40–18:10 · 하차 약 18:25', '#F97316', 3),
-  ('YOUR_CHILD_ID'::uuid, 0, '18:45:00', '20:07:00', '수영', 'activity', NULL, '#0EA5E9', 4),
+  INSERT INTO public.weekly_timetable
+    (child_id, day_of_week, start_time, end_time, title, category, notes, color, sort_order)
+  SELECT target_child_id, day_of_week, start_time::time, end_time::time,
+         title, category, notes, color, sort_order
+  FROM (VALUES
+    -- 요일: 0=월, 1=화, 2=수, 3=목, 4=금, 5=토, 6=일
+    (0, '09:00', '13:00', '학교', 'school', '기존 시간 유지 (이미지 미표기)', '#6B7280', 0),
+    (0, '13:30', '15:00', '돌봄', 'care', '이미지 칸 경계 기준', '#EAB308', 1),
+    (0, '15:15', '16:00', '구몬', 'academy', '15:15 시작 · 종료는 기존 시간 유지', '#3B82F6', 2),
+    (0, '16:20', '18:25', '폴리 셔틀', 'activity', '셔틀 16:20 · 수업 16:40–18:10 · 셔틀 18:25', '#F97316', 3),
+    (0, '18:25', '18:40', '집', 'other', NULL, '#A3CD39', 4),
+    (0, '18:45', '20:07', '수영', 'activity', NULL, '#0EA5E9', 5),
+    (1, '09:00', '13:00', '학교', 'school', '기존 시간 유지 (이미지 미표기)', '#6B7280', 0),
+    (1, '13:40', '15:40', '올림수학', 'academy', NULL, '#3B82F6', 1),
+    (1, '16:00', '17:00', '피아노', 'activity', NULL, '#EC4899', 2),
+    (1, '17:00', '18:00', '복싱', 'activity', NULL, '#F97316', 3),
+    (1, '18:00', '18:25', '집', 'other', '원본의 영도 시작 18:20과 5분 겹침', '#A3CD39', 4),
+    (1, '18:20', '20:20', '영도 (선택)', 'academy', '선택 참여 일정 · 매주 반드시 참석하는 일정이 아님', '#818FBF', 5),
+    (2, '09:00', '12:30', '학교', 'school', '기존 시간 유지 (이미지 미표기)', '#6B7280', 0),
+    (2, '13:00', '14:20', '방과후 · 웹툰교실A', 'afterschool', '과학실2', '#10B981', 1),
+    (2, '14:20', '14:50', '돌봄', 'care', '돌봄 30분 · 웹툰교실 종료와 첼로 시작 사이', '#EAB308', 2),
+    (2, '14:50', '15:30', '첼로', 'activity', NULL, '#EC4899', 3),
+    (2, '15:30', '16:10', '집', 'other', NULL, '#A3CD39', 4),
+    (2, '16:20', '18:25', '폴리 셔틀', 'activity', '셔틀 16:20 · 수업 16:40–18:10 · 셔틀 18:25', '#F97316', 5),
+    (2, '18:25', '18:50', '집', 'other', NULL, '#A3CD39', 6),
+    (2, '19:00', '20:00', '줄넘기', 'activity', NULL, '#8B5CF6', 7),
+    (3, '09:00', '13:40', '학교', 'school', '기존 시간 유지 (이미지 미표기)', '#6B7280', 0),
+    (3, '13:40', '15:00', '방과후 · 바둑A', 'afterschool', '과학실1', '#10B981', 1),
+    (3, '15:00', '16:00', '돌봄', 'care', '이미지 칸 경계 기준', '#EAB308', 2),
+    (3, '16:00', '17:00', '피아노', 'activity', NULL, '#EC4899', 3),
+    (3, '17:00', '18:00', '복싱', 'activity', NULL, '#F97316', 4),
+    (3, '18:00', '19:00', '한우리', 'academy', NULL, '#3B82F6', 5),
+    (4, '09:00', '12:30', '학교', 'school', '기존 시간 유지 (이미지 미표기)', '#6B7280', 0),
+    (4, '12:40', '14:00', '돌봄', 'care', NULL, '#EAB308', 1),
+    (4, '14:00', '16:00', '올림수학', 'academy', NULL, '#3B82F6', 2),
+    (4, '16:20', '18:25', '폴리 셔틀', 'activity', '셔틀 16:20 · 수업 16:40–18:10 · 셔틀 18:25', '#F97316', 3),
+    (4, '18:25', '18:50', '집', 'other', NULL, '#A3CD39', 4),
+    (4, '19:00', '20:00', '줄넘기', 'activity', NULL, '#8B5CF6', 5),
+    (5, '09:00', '11:00', '영도', 'academy', NULL, '#818FBF', 0),
+    (5, '11:00', '13:00', 'CMS', 'academy', '수학 학원', '#3B82F6', 1),
+    (5, '16:00', '17:00', 'K-pop 댄스', 'activity', '이미지 칸 경계 기준', '#EC4899', 2),
+    (5, '19:00', '20:30', '천문대 (매월 4주차)', 'activity', '매월 4주차 토요일만 참석', '#6366F1', 3)
+  ) AS timetable(day_of_week, start_time, end_time, title, category, notes, color, sort_order);
+END;
+$$;
 
-  -- ========== 화요일 (1) ==========
-  ('YOUR_CHILD_ID'::uuid, 1, '09:00:00', '13:00:00', '학교', 'school', NULL, '#6B7280', 0),
-  ('YOUR_CHILD_ID'::uuid, 1, '13:40:00', '15:40:00', '올림수학', 'academy', '13:40–15:40', '#3B82F6', 1),
-  ('YOUR_CHILD_ID'::uuid, 1, '16:00:00', '17:00:00', '피아노', 'activity', NULL, '#EC4899', 2),
-  ('YOUR_CHILD_ID'::uuid, 1, '17:00:00', '18:00:00', '복싱', 'activity', NULL, '#F97316', 3),
-
-  -- ========== 수요일 (2) ==========
-  ('YOUR_CHILD_ID'::uuid, 2, '09:00:00', '12:30:00', '학교', 'school', NULL, '#6B7280', 0),
-  ('YOUR_CHILD_ID'::uuid, 2, '13:00:00', '14:20:00', '방과후 · 웹툰교실A', 'afterschool', '13:00–14:20 / 웹툰교실A (과학실2)', '#10B981', 1),
-  ('YOUR_CHILD_ID'::uuid, 2, '14:30:00', '16:00:00', '돌봄', 'care', NULL, '#EAB308', 2),
-  ('YOUR_CHILD_ID'::uuid, 2, '16:20:00', '18:25:00', '폴리 셔틀', 'activity', '셔틀 16:20 · 수업 16:40–18:10 · 하차 약 18:25', '#F97316', 3),
-  ('YOUR_CHILD_ID'::uuid, 2, '19:00:00', '19:30:00', '줄넘기', 'activity', NULL, '#8B5CF6', 4),
-
-  -- ========== 목요일 (3) ==========
-  ('YOUR_CHILD_ID'::uuid, 3, '09:00:00', '13:40:00', '학교', 'school', NULL, '#6B7280', 0),
-  ('YOUR_CHILD_ID'::uuid, 3, '13:40:00', '15:00:00', '방과후 · 바둑A', 'afterschool', '13:40–15:00 / 바둑A (과학실1)', '#10B981', 1),
-  ('YOUR_CHILD_ID'::uuid, 3, '15:00:00', '16:00:00', '돌봄', 'care', NULL, '#EAB308', 2),
-  ('YOUR_CHILD_ID'::uuid, 3, '16:00:00', '17:00:00', '피아노', 'activity', NULL, '#EC4899', 3),
-  ('YOUR_CHILD_ID'::uuid, 3, '17:00:00', '18:00:00', '복싱', 'activity', NULL, '#F97316', 4),
-
-  -- ========== 금요일 (4) ==========
-  ('YOUR_CHILD_ID'::uuid, 4, '09:00:00', '12:30:00', '학교', 'school', NULL, '#6B7280', 0),
-  ('YOUR_CHILD_ID'::uuid, 4, '13:00:00', '14:20:00', '방과후 · 창의미술A', 'afterschool', '13:00–14:20 / 창의미술A (과학실2)', '#10B981', 1),
-  ('YOUR_CHILD_ID'::uuid, 4, '14:30:00', '16:00:00', '돌봄', 'care', NULL, '#EAB308', 2),
-  ('YOUR_CHILD_ID'::uuid, 4, '16:20:00', '18:25:00', '폴리 셔틀', 'activity', '셔틀 16:20 · 수업 16:40–18:10 · 하차 약 18:25', '#F97316', 3),
-  ('YOUR_CHILD_ID'::uuid, 4, '19:00:00', '19:30:00', '줄넘기', 'activity', NULL, '#8B5CF6', 4),
-
-  -- ========== 토요일 (5) ==========
-  ('YOUR_CHILD_ID'::uuid, 5, '10:30:00', '13:30:00', 'CMS', 'academy', '수학 학원', '#3B82F6', 0),
-  ('YOUR_CHILD_ID'::uuid, 5, '16:00:00', '17:00:00', 'K-pop 댄스', 'activity', NULL, '#EC4899', 1),
-  ('YOUR_CHILD_ID'::uuid, 5, '19:00:00', '20:00:00', '천문대', 'activity', '매월 마지막 주 토요일 등 원본 일정에 맞춰 조정 가능', '#6366F1', 2);
-
--- 일요일(6): 원본에 일정 없음 → 행 없음
+-- 일요일(6): 일정 없음

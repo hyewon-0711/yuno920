@@ -1,5 +1,5 @@
 .page {
-  padding: var(--space-5);
+  padding: var(--page-padding);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@
   display: inline-flex;
   align-items: center;
   align-self: flex-start;
-  background: linear-gradient(135deg, var(--tab-play) 0%, #A78BFA 100%);
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #D79270 100%);
   color: white;
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
@@ -85,7 +85,7 @@
 }
 
 .cardFront {
-  background: linear-gradient(135deg, var(--tab-play) 0%, #A78BFA 100%);
+  background: linear-gradient(135deg, var(--brand-primary) 0%, #D79270 100%);
   color: white;
 }
 
@@ -128,6 +128,7 @@
   width: 100%;
   max-width: var(--max-width);
   background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   padding: var(--space-6);
   box-shadow: var(--shadow-md);
@@ -150,7 +151,7 @@
 }
 
 .resultStats strong {
-  color: var(--tab-play);
+  color: var(--brand-primary);
   font-size: 24px;
 }
 
@@ -183,12 +184,12 @@
 }
 
 .resultBtnPrimary {
-  background: var(--tab-play);
-  border-color: var(--tab-play);
+  background: var(--brand-primary);
+  border-color: var(--brand-primary);
   color: white;
 }
 
 .resultBtnPrimary:hover {
-  background: #7C3AED;
-  border-color: #7C3AED;
+  background: var(--action-primary-hover);
+  border-color: var(--action-primary-hover);
 }
